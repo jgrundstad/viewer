@@ -25,6 +25,8 @@ class Sample(models.Model):
     description = models.CharField(max_length=256,
                                    verbose_name="Sample Description",
                                    blank=True)
+    cellularity = models.CharField(max_length=8, verbose_name='% Cellularity',
+                                   blank=True)
     study = models.ForeignKey(Study)
     creation_date = models.DateTimeField('Date Created', auto_now=True,
                                          blank=True)
