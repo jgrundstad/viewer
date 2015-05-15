@@ -9,7 +9,7 @@
 		<table>
 			{{ bnid_form.as_table }}
 		</table>
-		<input type="submit" value="Create" />
+		<input type="button" class="btn btn-primary" value="Create" />
 	</form>
 	<br>
 </div>
@@ -33,7 +33,7 @@
 				<td>{{b.sample.study}}</td>
 				<td>{{b.sample.name}}</td>
 				<td>{{b.sample.description}}</td>
-				<td>{{b.bnid}}</td>
+				<td><a href="/viewer/bnid_edit/{{ b.pk }}/" title="edit bnid" data-tooltip>{{b.bnid}}</a></td>
 				<td>{{b.description}}</td>
 				<td>{{b.creation_date}}</td>
 			</tr>

@@ -9,7 +9,7 @@
 		<table>
 			{{ sample_form.as_table }}
 		</table>
-		<input type="submit" value="Create" />
+		<input type="submit" class="btn btn-primary" value="Create" />
 	</form>
 	<br>
 </div>
@@ -30,7 +30,7 @@
 			{% for s in samples %}
 				<tr>
 					<td>{{s.study}}</td>
-					<td>{{s.name}}</td>
+					<td><a href="/viewer/sample_edit/{{s.pk}}/" title="edit sample" data-tooltip>{{s.name}}</a></td>
 					<td>{{s.description}}</td>
 					<td>{{s.cellularity}}</td>
 					<td>{{s.creation_date}}</td>

@@ -1,4 +1,8 @@
 {% extends "viewer/base.html" %}
+{% load staticfiles %}
+{% block extra_js %}
+
+{% endblock %}
 
 {% block content %}
 <div class="container" style="text-align: 'center'">
@@ -9,13 +13,22 @@
 		<table>
 			{{ study_form.as_table }}
 		</table>
-		<input type="submit" value="Create" />
+		<input type="submit" class="btn btn-primary" value="Create" />
 	</form>
 	<br>
 </div>
 <hr>
 <div class="container" style="text-align: 'center'">
 	<h3>Available Studies:</h3>
+	<!-- .modal -->
+	<div class="modal fade" id="sampleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+    		<div class="modal-content">
+
+			</div>
+		</div>
+	</div>
+	<!-- /.modal -->
 	<table class="table table-hover">
 		<thead>
 			<tr>
@@ -27,13 +40,20 @@
 			<tbody>
 				{% for s in studies %}
 				<tr>
-					<td>{{s}}</td>
+					<td><a href="/viewer/study_edit/{{s.pk}}" title="edit study" data-tooltip>{{s}}</a></td>
 					<td>{{s.description}}</td>
 					<td>{{s.creation_date}}</td>
 				</tr>
 				{% endfor %}
 			</tbody>
 	</table>
+		<script type="text/javascript">
+            var form_options = {
+				target: '#sampleModal',
+                success: function() { }
+            }
+            $('#study_edit_form').ajaxForm(form_options);
+        </script>
 </div>
 
 {% endblock %}

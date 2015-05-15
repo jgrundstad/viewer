@@ -90,6 +90,21 @@ def new_study(request):
         return render_to_response('viewer/new_study.html', context,
                                   context_instance=RequestContext(request))
 
+@user_passes_test(in_proj_user_group)
+def edit_study(request, study_id):
+    if request.method == 'POST':
+        s = Study.objects.get(pk=study_id)
+        updated_form = StudyForm(request.POST, instance=s)
+        if updated_form.is_valid():
+            updated_form.save()
+            return HttpResponseRedirect('/viewer/new_study/')
+    else:
+        study_obj = Study.objects.get(pk=study_id)
+        sform = StudyForm(instance=study_obj)
+        context = {'study_form': sform, 'name': study_obj.name, 'pk': study_obj.pk}
+        context.update(csrf(request))
+        return render_to_response('viewer/study_edit.html', context,
+                                  context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
 def new_bionimbus_id(request):
@@ -107,6 +122,21 @@ def new_bionimbus_id(request):
         return render_to_response('viewer/new_bionimbus_id.html', context,
                                   context_instance=RequestContext(request))
 
+@user_passes_test(in_proj_user_group)
+def edit_bionimbus_id(request, bnid_id):
+    if request.method == 'POST':
+        b = Sample.objects.get(pk=bnid_id)
+        updated_form = BnidForm(request.POST, instance=b)
+        if updated_form.is_valid():
+            updated_form.save()
+            return HttpResponseRedirect('/viewer/new_bionimbus_id/')
+    else:
+        bnid_obj = Bnid.objects.get(pk=bnid_id)
+        bform = BnidForm(instance=bnid_obj)
+        context = {'bnid_form': bform, 'bnid': bnid_obj.bnid, 'pk': bnid_obj.pk}
+        context.update(csrf(request))
+        return render_to_response('viewer/bnid_edit.html', context,
+                                  context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
 def new_sample(request):
@@ -124,6 +154,21 @@ def new_sample(request):
         return render_to_response('viewer/new_sample.html', context,
                                   context_instance=RequestContext(request))
 
+@user_passes_test(in_proj_user_group)
+def edit_sample(request, sample_id):
+    if request.method == 'POST':
+        s = Sample.objects.get(pk=sample_id)
+        updated_form = SampleForm(request.POST, instance=s)
+        if updated_form.is_valid():
+            updated_form.save()
+            return HttpResponseRedirect('/viewer/new_sample/')
+    else:
+        sample_obj = Sample.objects.get(pk=sample_id)
+        sform = SampleForm(instance=sample_obj)
+        context = {'sample_form': sform, 'name': sample_obj.name, 'pk': sample_obj.pk}
+        context.update(csrf(request))
+        return render_to_response('viewer/sample_edit.html', context,
+                                  context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
 def upload_report(request):

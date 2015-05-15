@@ -1,7 +1,10 @@
 from django.conf.urls import patterns, url
 from django.conf import settings
 from django.conf.urls.static import static
+
 import views
+import update_views
+
 
 urlpatterns = patterns('',
                        url(r'^$', views.index, name='index'),
@@ -23,5 +26,11 @@ urlpatterns = patterns('',
                            'django.views.static.serve',
                            {'document_root': settings.MEDIA_ROOT}),
                        url(r'view_report/(?P<file_id>\d+)/$',
-                           views.view_report, name='view_report')
+                           views.view_report, name='view_report'),
+                       url(r'study_edit/(?P<study_id>\d+)/$',
+                           views.edit_study, name='study_edit'),
+                       url(r'sample_edit/(?P<sample_id>\d+)/$',
+                           views.edit_sample, name='sample_edit'),
+                       url(r'bnid_edit/(?P<bnid_id>\d+)/$',
+                           views.edit_bionimbus_id, name='bnid_edit'),
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

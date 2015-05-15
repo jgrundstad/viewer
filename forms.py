@@ -21,7 +21,7 @@ class BnidForm(forms.ModelForm):
 class SampleForm(forms.ModelForm):
     class Meta:
         model = Sample
-        fields = ['study', 'name', 'description']
+        fields = ['study', 'name', 'description', 'cellularity']
 
 
 class CallerForm(forms.ModelForm):
