@@ -31,7 +31,7 @@ class CallerForm(forms.ModelForm):
 
 
 class ReportForm(forms.ModelForm):
-    report_file = forms.FileField(widget=AdminFileWidget)
+    report_file = forms.FileField(widget=AdminFileWidget, required=False)
 
     class Meta:
         model = Report

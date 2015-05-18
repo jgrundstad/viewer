@@ -52,7 +52,8 @@ class Report(models.Model):
     study = models.ForeignKey(Study)
     upload_date = models.DateTimeField('Date Uploaded', auto_now=True)
     bnids = models.ManyToManyField(Bnid, verbose_name='Bionimbus ID')
-    report_file = models.FileField('Report File', upload_to='')
+    report_file = models.FileField('Report File', upload_to='', blank=True,
+                                   null=True)
 
     def __str__(self):
         return str(self.upload_date)
