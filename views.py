@@ -206,9 +206,6 @@ def view_report(request, file_id):
     # add table class and id
     report_html = report_html.replace("<table>",
         "<table class=\"table table-hover sortable\" id=\"report-table\">")
-        #"<table class=\"tablesorter\" id=\"report-table\">")
-    #report_html = report_html.replace("<thead>",
-    #                                  "<thead class=\"persist-header\">")
 
 
     #print report_html
