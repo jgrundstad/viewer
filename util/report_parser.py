@@ -16,8 +16,9 @@ def add_goodies(atoms, headers, md_anderson_genes):
         # add MDAnderson link to appropriate gene names
         if (headers[i] == 'gene') and (atoms[i] is not None) and (
                     atoms[i].lower() in md_anderson_genes):
-            new_link = '{gene}<br><font size=-2><a href={link}>MDAnderson' + \
-                           '</a></font>'
+            new_link = '''{gene}<br><font size=-2><a href={link}
+            target=\"_blank">MDAnderson</a></font>'''
+
             atoms[i] = new_link.format(
                 link=md_anderson_genes[atoms[i].lower()],
                 gene=atoms[i])
@@ -42,7 +43,9 @@ def json_from_report(filename):
         # remove '%' character to allow numerical sorting on pct columns
         line = line.replace('%', '')
         tokens = line.rstrip('\n').split(splitby)
-        formatted_line = add_goodies(tokens, cols, md_anderson_genes)
-        d.append(formatted_line)
+        if len(tokens) > 1:
+            if 'INTRON' not in line and 'INTERGENIC' not in line:
+                formatted_line = add_goodies(tokens, cols, md_anderson_genes)
+                d.append(formatted_line)
     data = tablib.Dataset(*d, headers=cols)
     return data
