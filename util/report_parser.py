@@ -41,7 +41,7 @@ def json_from_report(filename):
 
     for line in report_file:
         # remove '%' character to allow numerical sorting on pct columns
-        line = line.replace('%', '')
+        #line = line.replace('%', '')
         tokens = line.rstrip('\n').split(splitby)
         if len(tokens) > 1:
             if 'INTRON' not in line and 'INTERGENIC' not in line:

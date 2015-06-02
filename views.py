@@ -205,7 +205,7 @@ def view_report(request, file_id):
     report_html = str(report_data.html)
     # add table class and id
     report_html = report_html.replace("<table>",
-        "<table class=\"table table-hover sortable\" id=\"report-table\">")
+        "<table class=\"table table-hover\" id=\"report-table\">")
 
 
     #print report_html
