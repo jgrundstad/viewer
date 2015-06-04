@@ -1,3 +1,5 @@
+import numpy
+
 __author__ = 'Jason Grundstad'
 from django.conf import settings
 from bs4 import BeautifulSoup
