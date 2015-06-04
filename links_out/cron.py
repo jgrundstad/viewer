@@ -7,4 +7,4 @@ from ..util import link_out_scraper
 
 
 def gather_md_anderson():
-    link_out_scraper.grab_mdanderson()
+    link_out_scraper.scrape_mdanderson()

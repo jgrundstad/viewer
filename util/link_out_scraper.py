@@ -20,9 +20,9 @@ def merge_dicts(x, y):
     return z
 
 
-def find_mdanderson_genes(soup):
+def find_mdanderson_gene_links(soup):
     """
-
+    Parse out gene links from mdAnderson page
     :rtype : dict
     """
     gene_list = dict()
@@ -57,9 +57,9 @@ def find_mdanderson_next_page(soup):
     return page
 
 
-def grab_mdanderson():
+def scrape_mdanderson():
     """
-
+    Scrape the mdanderson site for pages containing gene names and links
     :rtype : dict
     """
     page = 1
@@ -70,7 +70,7 @@ def grab_mdanderson():
         soup = BeautifulSoup(requests.get(md_url).text)
 
         # find genes on this page
-        page_gene_list = find_mdanderson_genes(soup)
+        page_gene_list = find_mdanderson_gene_links(soup)
         gene_list = merge_dicts(gene_list, page_gene_list)
 
         # is there another page to pull from
@@ -83,7 +83,7 @@ def grab_mdanderson():
 
 
 def main():
-    grab_mdanderson()
+    scrape_mdanderson()
 
 
 if __name__ == '__main__':
