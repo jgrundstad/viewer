@@ -9,6 +9,7 @@ class BnidAdmin(admin.ModelAdmin):
 
 class SampleAdmin(admin.ModelAdmin):
     model = Sample
+    list_display =('id', 'name')
 
 
 class CallerAdmin(admin.ModelAdmin):

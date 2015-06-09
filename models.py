@@ -36,7 +36,6 @@ class Sample(models.Model):
 
 
 class Bnid(models.Model):
-    #study = models.ForeignKey(Study)
     sample = models.ForeignKey(Sample)
     bnid = models.CharField(max_length=12, verbose_name='Bionimbus ID')
     description = models.CharField(max_length=256, verbose_name='Description',

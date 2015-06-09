@@ -16,12 +16,16 @@ class BnidForm(forms.ModelForm):
     class Meta:
         model = Bnid
         fields = ['sample', 'bnid', 'description']
+        widgets = {'description': forms.Textarea(attrs={'cols': 30,
+                                                        'rows': 4}),}
 
 
 class SampleForm(forms.ModelForm):
     class Meta:
         model = Sample
         fields = ['study', 'name', 'description', 'cellularity']
+        widgets = {'description': forms.Textarea(attrs={'cols': 30,
+                                                        'rows': 4}),}
 
 
 class CallerForm(forms.ModelForm):
@@ -42,3 +46,17 @@ class StudyForm(forms.ModelForm):
     class Meta:
         model = Study
         fields = ['name', 'description']
+        widgets = {'description': forms.Textarea(attrs={'cols': 30,
+                                                        'rows': 4}),}
+
+class StudySelectorForm(forms.Form):
+
+    study = forms.ModelChoiceField(
+        queryset=Study.objects.all(),
+        widget=forms.Select(attrs={'class': 'study_name'}),
+    )
+
+    class Meta:
+        fields = ['study']
+        widgets = {'study': forms.Select()}
+

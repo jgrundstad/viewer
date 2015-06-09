@@ -5,8 +5,10 @@ from django.core.context_processors import csrf
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
+import simplejson
 
 from forms import BnidForm, SampleForm, ReportForm, StudyForm, UserForm
+from forms import StudySelectorForm
 from models import Bnid, Sample, Report, Study
 from access_tests import in_proj_user_group
 
@@ -107,15 +109,20 @@ def edit_study(request, study_id):
                                   context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
-def new_bionimbus_id(request):
+def new_bionimbus_id(request): #study_id=None, **kwargs):
+    #if study_id:
+        #print "Got study_id: {}".format(study_id)
     if request.method == 'POST':
         bform = BnidForm(request.POST, instance=Bnid())
+        print bform['sample']
+        print bform['bnid']
         if bform.is_valid():
             bform.save()
         return HttpResponseRedirect('/viewer/new_bionimbus_id/')
     else:
         bform = BnidForm(instance=Bnid())
-        context = {'bnid_form': bform}
+        ss_form = StudySelectorForm()
+        context = {'bnid_form': bform, 'study_selector_form': ss_form}
         bnids = Bnid.objects.all().order_by('-bnid')
         context['bnids'] = bnids
         context.update(csrf(request))
@@ -215,3 +222,13 @@ def view_report(request, file_id):
                'report_obj': report_obj}
     return render_to_response('viewer/view_report.html', context,
                               context_instance=RequestContext(request))
+
+@user_passes_test(in_proj_user_group)
+def get_samples(request, study_id=None, **kwargs):
+    sample_dict = {}
+    if study_id:
+        study = Study.objects.get(pk=study_id)
+        samples = Sample.objects.filter(study=study)
+        for sample in samples:
+            sample_dict[sample.id] = sample.name
+    return HttpResponse(simplejson.dumps(sample_dict), content_type="application/json")
