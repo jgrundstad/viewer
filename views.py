@@ -214,7 +214,6 @@ def view_report(request, file_id):
     report_html = report_html.replace("<table>",
         "<table class=\"table table-hover\" id=\"report-table\">")
 
-
     #print report_html
     context = {'report_html': report_html,
                'filename': report_obj.report_file.name.split('/')[1],
@@ -231,4 +230,19 @@ def get_samples(request, study_id=None, **kwargs):
         samples = Sample.objects.filter(study=study)
         for sample in samples:
             sample_dict[sample.id] = sample.name
-    return HttpResponse(simplejson.dumps(sample_dict), content_type="application/json")
+    return HttpResponse(simplejson.dumps(sample_dict),
+                        content_type="application/json")
+
+
+@user_passes_test(in_proj_user_group)
+def get_bnids_by_study(request, study_id=None):
+    bnid_dict = {}
+    if study_id:
+        study = Study.objects.get(pk=study_id)
+        samples = Sample.objects.filter(study=study)
+        for sample in samples:
+            bnids = Bnid.objects.filter(sample=sample)
+            for bnid in bnids:
+                bnid_dict[bnid.id] = "{}".format(bnid)
+    return HttpResponse(simplejson.dumps(bnid_dict),
+                        content_type="application/json")
