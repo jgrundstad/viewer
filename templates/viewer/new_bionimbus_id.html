@@ -27,11 +27,11 @@ jQuery(document).ready(function(){
 	<p>
 	<h2>Create a new BionimbusID</h2>
 	<form>
-		{{ study_selector_form.as_table }}
+		<table>
+			{{ study_selector_form.as_table }}
 	</form>
 	<form action="/viewer/new_bionimbus_id/" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
-		<table>
 			{{ bnid_form.as_table }}
 			{% if bnid_form.errors %}
     			{% for field in bnid_form %}
