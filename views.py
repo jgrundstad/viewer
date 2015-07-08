@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.core.context_processors import csrf
+from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
@@ -30,12 +31,22 @@ def register(request):
             user.set_password(user.password)
             user.save()
             registered = True
+            firstname = user_form['first_name'].value()
+            lastname = user_form['last_name'].value()
+            subject = 'Report Viewer Registration: {}, {}'.format(
+                lastname, firstname)
+            message = 'User {} {} has registered and needs to be vetted.'.format(
+                firstname, lastname)
+            send_mail(subject, message, 'jgrundstad@uchicago.edu',
+                      ['jgrundstad@uchicago.edu'], fail_silently=False)
         else:
             print user_form.errors
     else:
         user_form = UserForm()
-    return render(request, 'viewer/register.html', {'user_form': user_form,
-                                                    'registered': registered})
+    context = {'user_form': user_form, 'registered': registered}
+    context.update(csrf(request))
+    return render_to_response('viewer/register.html', context,
+                              context_instance=RequestContext(request))
 
 
 def user_login(request):

@@ -5,14 +5,20 @@
 	<h1>Variant Report Viewer</h1>
 	<h2>Account registration</h2>
 	{% if registered %}
-		<strong>Thank you for registering.</strong>
+    <br>
+		<strong>Thank you for registering.</strong>  An email has been sent to the
+    <a href="mailto:jgrundstad@uchicago.edu">site administrator</a>.  You will be able to log
+    in to the site once your account has been approved.
 	{% else %}
 	<form id="user_form" method="POST" action="/viewer/register/"
 		enctype="multipart/form-data">
 		{% csrf_token %}
-		{{ user_form.as_p }}
+		<table>
+			{{ user_form.as_table }}
+		</table>
 		<input type="submit" name="submit" value="Register"/>
 	</form>
 	{% endif %}
+
 </div>
 {% endblock %}
