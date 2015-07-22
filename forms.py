@@ -9,7 +9,7 @@ class UserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password']
+        fields = ['email', 'first_name', 'last_name', 'password']
 
 
 class BnidForm(forms.ModelForm):
@@ -39,7 +39,7 @@ class ReportForm(forms.ModelForm):
 
     class Meta:
         model = Report
-        fields = ['study', 'bnids', 'caller', 'report_file']
+        fields = ['study', 'bnids', 'genome', 'caller', 'report_file']
 
 
 class StudyForm(forms.ModelForm):

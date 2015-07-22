@@ -257,3 +257,11 @@ def get_bnids_by_study(request, study_id=None):
                 bnid_dict[bnid.id] = "{}".format(bnid)
     return HttpResponse(simplejson.dumps(bnid_dict),
                         content_type="application/json")
+
+@user_passes_test(in_proj_user_group)
+def load_variants(request, report_id=None):
+    print "Load Variants for Report ID: {}".format(report_id)
+    report_obj = Report.objects.get(pk=report_id)
+    report_parser.load_into_db(report_obj)
+    return HttpResponseRedirect('/viewer/upload_report/')
+

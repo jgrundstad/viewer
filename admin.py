@@ -1,6 +1,6 @@
 from django.contrib import admin
-from models import Bnid, Sample, Study, Caller, Report
-
+from models import Bnid, Sample, Study, Caller, Report, Variant, \
+    Genome
 
 
 class BnidAdmin(admin.ModelAdmin):
@@ -26,8 +26,22 @@ class StudyAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
 
 
+class GenomeAdmin(admin.ModelAdmin):
+    model = Genome
+    list_display = ('id', 'name')
+
+
+class VariantAdmin(admin.ModelAdmin):
+    model = Variant
+    list_display = ('__str__', 'report', 'gene_name', 'chrom', 'pos', 'ref', 'alt',
+                    'normal_ref_count', 'normal_alt_count', 'tumor_ref_count',
+                    'tumor_alt_count')
+
+
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(Bnid, BnidAdmin)
 admin.site.register(Study, StudyAdmin)
 admin.site.register(Caller, CallerAdmin)
 admin.site.register(Report, ReportAdmin)
+admin.site.register(Genome, GenomeAdmin)
+admin.site.register(Variant, VariantAdmin)

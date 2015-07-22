@@ -37,6 +37,8 @@ urlpatterns = patterns('',
                        # Report
                        url(r'^upload_report/$', views.upload_report,
                            name='upload_report'),
+                       url(r'^load_variants/(?P<report_id>\d+)/$', views.load_variants,
+                           name='load_variants'),
                        url(r'^files/(?P<path>.*)$',
                            'django.views.static.serve',
                            {'document_root': settings.MEDIA_ROOT}),

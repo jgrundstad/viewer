@@ -21,9 +21,11 @@
 			<tr>
 				<th>Study</th>
 				<th>Sample(s)</th>
+				<th>Genome</th>
 				<th>Caller</th>
 				<th>Filename</th>
 				<th>Upload Date</th>
+				<th>Load Variants?</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -35,9 +37,17 @@
 						{{b.sample}} ({{b.bnid}})<br>
 					{%endfor%}
 				</td>
+				<td>{{r.genome}}</td>
 				<td>{{r.caller}}</td>
 				<td><a href=/viewer/view_report/{{r.pk}}/>{{r.report_file.name}}</a></td>
 				<td>{{r}}</td>
+				<td>
+					<form action="/viewer/load_variants/{{r.id}}/" method="POST">
+						{% csrf_token %}
+						<input type="hidden" name="Load" id={{r.id}} value="Load"/>
+						<input type="submit" value="Load"/>
+					</form>
+				</td>
 			</tr>
 			{% endfor %}
 		</tbody>

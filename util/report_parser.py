@@ -3,6 +3,7 @@ from django.conf import settings
 import json
 import os
 import tablib
+from viewer.models import Variant, Report
 
 
 def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
@@ -70,3 +71,37 @@ def json_from_report(filename):
                 d.append(formatted_line)
     data = tablib.Dataset(*d, headers=cols)
     return data
+
+
+def load_into_db(report):
+    report_file = open(settings.MEDIA_ROOT + report.report_file.name, 'r')
+    header_line = report_file.readline().strip()
+    splitby =','
+    if '\t' in header_line:
+        splitby = '\t'
+    cols = header_line.split(splitby)
+    print "cols: {}".format(cols)
+
+    for line in report_file:
+        toks = line.rstrip('\n').split(splitby)
+        if len(toks) > 1:
+            variant = Variant()
+            # skip over missing Int fields
+            for intfield in ['pos', 'normal_ref_count', 'normal_alt_count',
+                             'tumor_ref_count', 'tumor_alt_count',
+                             'amino_acid_length']:
+                if toks[cols.index(intfield)]:
+                    setattr(variant, intfield, int(toks[cols.index(intfield)]))
+
+            variant.report = report
+            variant.chrom = toks[cols.index('chr')]
+            variant.ref = toks[cols.index('ref')]
+            variant.alt = toks[cols.index('alt')]
+            variant.context = toks[cols.index('context')]
+            variant.dbSnp_id = toks[cols.index('dbSnp_id')]
+            variant.gene_name = toks[cols.index('gene')]
+            variant.effect = toks[cols.index('effect')]
+            variant.coding = toks[cols.index('coding')]
+            variant.codon_change = toks[cols.index('codon_change')]
+            variant.amino_acid_change = toks[cols.index('amino_acid_change')]
+            variant.save()
