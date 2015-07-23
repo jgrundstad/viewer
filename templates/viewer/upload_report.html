@@ -39,6 +39,7 @@
 				</td>
 				<td>{{r.genome}}</td>
 				<td>{{r.caller}}</td>
+                {% if r.report_file.name %}
 				<td><a href=/viewer/view_report/{{r.pk}}/>{{r.report_file.name}}</a></td>
 				<td>{{r}}</td>
 				<td>
