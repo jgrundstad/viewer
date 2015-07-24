@@ -1,10 +1,31 @@
 {% extends "viewer/base.html" %}
 
+{% block extra_js %}
+<script type="text/javascript">
+jQuery(document).ready(function(){
+    $('select[name=study]').change(function(){
+        var study_id = $(this).val();
+        var options = [];
+        request_url = '/viewer/get_bnids_by_study/' + study_id + '/';
+        $.getJSON(
+            request_url,
+            function(data){
+                $.each(data, function(key, val) {
+                    options.push('<option value="' + key + '">' + val + '</option>');
+                })
+                $('select[name=bnids]').html(options.join('\n'));
+            }
+        )
+    })
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container" style="text-align: 'center'">
 	<p>
 	<h2>Upload a new Variant Report</h2>
-	<form action="/viewer/upload_report/" method="post" enctype="multipart/form-data">
+	<form name='upload_report_form' action="/viewer/upload_report/" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
 		<table>
 			{{ report_form.as_table }}
@@ -35,18 +56,26 @@
 				<td>
 					{% for b in r.bnids.all %}
 						{{b.sample}} ({{b.bnid}})<br>
-					{%endfor%}
+					{% endfor %}
 				</td>
 				<td>{{r.genome}}</td>
 				<td>{{r.caller}}</td>
                 {% if r.report_file.name %}
 				<td><a href=/viewer/view_report/{{r.pk}}/>{{r.report_file.name}}</a></td>
+                {% else %}
+                <td>
+                    <form action="/viewer/edit_report/{{r.id}}/" method="POST">
+                        <input type="hidden" name="Edit" id="{{r.id}}" value="Edit"/>
+                        <input type="submit" value="Upload"/>
+                    </form>
+                </td>
+                {% endif %}
 				<td>{{r}}</td>
 				<td>
 					<form action="/viewer/load_variants/{{r.id}}/" method="POST">
 						{% csrf_token %}
-						<input type="hidden" name="Load" id={{r.id}} value="Load"/>
-						<input type="submit" value="Load"/>
+						<input type="hidden" name="Load" id="load-{{r.id}}" value="Load"/>
+						<input type="submit" value="Load into DB"/>
 					</form>
 				</td>
 			</tr>

@@ -204,7 +204,7 @@ def upload_report(request):
             print "rform is Invalid"
             print str(rform)
     else:
-        rform = ReportForm(instance=Report())
+        rform = ReportForm(instance=Report(), initial={})
         context = {'report_form': rform}
         reports = Report.objects.all()
         context['reports'] = reports
@@ -247,7 +247,8 @@ def get_samples(request, study_id=None, **kwargs):
 
 @user_passes_test(in_proj_user_group)
 def get_bnids_by_study(request, study_id=None):
-    bnid_dict = {}
+    print "study_id: {}".format(study_id)
+    bnid_dict = dict()
     if study_id:
         study = Study.objects.get(pk=study_id)
         samples = Sample.objects.filter(study=study)

@@ -59,7 +59,7 @@ class Report(models.Model):
     study = models.ForeignKey(Study)
     genome = models.ForeignKey(Genome, default=1, blank=True)
     upload_date = models.DateTimeField('Date Uploaded', auto_now=True)
-    bnids = models.ManyToManyField(Bnid, verbose_name='Bionimbus ID')
+    bnids = models.ManyToManyField(Bnid, verbose_name='Bionimbus ID', blank=True)
     report_file = models.FileField('Report File', upload_to='', blank=True,
                                    null=True)
 

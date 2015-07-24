@@ -37,6 +37,10 @@ class CallerForm(forms.ModelForm):
 class ReportForm(forms.ModelForm):
     report_file = forms.FileField(widget=AdminFileWidget, required=False)
 
+    #def __init__(self, *args, **kwargs):
+    #    super(ReportForm, self).__init__(*args, **kwargs)
+    #    self.fields['bnids'] = forms.SelectMultiple()
+
     class Meta:
         model = Report
         fields = ['study', 'bnids', 'genome', 'caller', 'report_file']
