@@ -70,7 +70,7 @@ jQuery(document).ready(function(){
                     </form>
                 </td>
                 {% endif %}
-				<td>{{r}}</td>
+				<td>{{r.upload_date}}</td>
 				<td>
 					<form action="/viewer/load_variants/{{r.id}}/" method="POST">
 						{% csrf_token %}
