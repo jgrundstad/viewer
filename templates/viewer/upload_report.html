@@ -6,23 +6,23 @@ jQuery(document).ready(function(){
     $('select[name=study]').change(function(){
         var study_id = $(this).val();
         var options = [];
-        request_url = '/viewer/get_bnids_by_study/' + study_id + '/';
+        var request_url = '/viewer/get_bnids_by_study/' + study_id + '/';
         $.getJSON(
             request_url,
             function(data){
                 $.each(data, function(key, val) {
                     options.push('<option value="' + key + '">' + val + '</option>');
-                })
+                });
                 $('select[name=bnids]').html(options.join('\n'));
             }
-        )
-    })
+        );
+    });
 });
 </script>
 {% endblock %}
 
 {% block content %}
-<div class="container" style="text-align: 'center'">
+<div class="container">
 	<p>
 	<h2>Upload a new Variant Report</h2>
 	<form name='upload_report_form' action="/viewer/upload_report/" method="post" enctype="multipart/form-data">

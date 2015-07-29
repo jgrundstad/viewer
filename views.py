@@ -8,9 +8,11 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 import simplejson
 
+from django_ajax.decorators import ajax
+
 from forms import BnidForm, SampleForm, ReportForm, StudyForm, UserForm
 from forms import StudySelectorForm
-from models import Bnid, Sample, Report, Study
+from models import Bnid, Sample, Report, Study, Variant
 from access_tests import in_proj_user_group
 
 from util import report_parser
@@ -220,6 +222,8 @@ def view_report(request, file_id):
     report_obj = Report.objects.get(pk=file_id)
     report_data = report_parser.json_from_report(settings.MEDIA_ROOT + \
                                                  report_obj.report_file.name)
+
+    #print report_data
     report_html = str(report_data.html)
     # add table class and id
     report_html = report_html.replace("<table>",
@@ -266,3 +270,20 @@ def load_variants(request, report_id=None):
     report_parser.load_into_db(report_obj)
     return HttpResponseRedirect('/viewer/upload_report/')
 
+
+@user_passes_test(in_proj_user_group)
+def search_reports(request):
+    variant_fields = Variant._meta.get_all_field_names()
+    db_lookup = ''
+    context = {'variant_fields':variant_fields}
+    return render(request, 'viewer/search_reports.html', context)
+
+
+@user_passes_test(in_proj_user_group)
+@ajax
+def ajax_search_reports(request, search_col, search_term, search_type):
+    db_lookup = '%s__%s' % (search_col, search_type)
+    variants = Variant.objects.filter(**{db_lookup: search_term})
+    # from django.core import serializers
+    # vars = serializers.serialize('json', variants)
+    return report_parser.json_from_ajax(variants)

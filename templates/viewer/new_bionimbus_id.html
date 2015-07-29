@@ -6,17 +6,17 @@ jQuery(document).ready(function(){
 	$('select[name=study]').change(function(){
 		var study_id = $(this).val();
 		var options = [];
-		request_url = '/viewer/get_samples/' + study_id + '/';
+		var request_url = '/viewer/get_samples/' + study_id + '/';
 		$.getJSON(
 			request_url,
 			function(data){
 				$.each(data, function(key, val) {
 					options.push('<option value="' + key + '">' + val + '</option>');
-				})
+				});
 				$('select[name=sample]').html(options.join('\n'));
 			}
-		)
-	})
+		);
+	});
 });
 </script>
 {% endblock %}

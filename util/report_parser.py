@@ -72,6 +72,27 @@ def json_from_report(filename):
     data = tablib.Dataset(*d, headers=cols)
     return data
 
+def json_from_ajax(db_response):
+    records = db_response.values()
+
+    if len(records) == 0:
+        return ''
+
+    cols = []
+    for header in records[0]:
+        cols.append(header)
+
+    vals = []
+    for record in records:
+        r = []
+        for col in record:
+            r.append(record[col])
+        vals.append(r)
+
+    return tablib.Dataset(*vals, headers=cols).html
+
+
+
 
 def load_into_db(report):
     report_file = open(settings.MEDIA_ROOT + report.report_file.name, 'r')

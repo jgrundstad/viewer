@@ -48,4 +48,9 @@ urlpatterns = patterns('',
                        url(r'view_report/(?P<file_id>\d+)/$',
                            views.view_report, name='view_report'),
 
+                       # Search
+                       url(r'^search/$', views.search_reports, name='search_reports'),
+                       url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
+                           views.ajax_search_reports, name='ajax_search_reports'),
+
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
