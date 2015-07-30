@@ -74,8 +74,8 @@ jQuery(document).ready(function(){
 				<td>
 					<form action="/viewer/load_variants/{{r.id}}/" method="POST">
 						{% csrf_token %}
-						<input type="hidden" name="Load" id="load-{{r.id}}" value="Load" disabled/>
-						<input type="submit" value="Load into DB"/>
+						<input type="hidden" name="Load" id="load-{{r.id}}" value="Load"/>
+						<input type="submit" value="Load into DB" disabled/>
 					</form>
 				</td>
 			</tr>
