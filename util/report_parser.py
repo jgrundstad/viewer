@@ -16,16 +16,13 @@ def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
         # add MDAnderson and eMERGE links to appropriate gene names
         if (headers[i] == 'gene') and (atoms[i] is not None):
             # link to genecards
-            multiline = '<a href=\"http://www.genecards.org/index.php?path=/Search/keyword/{g}\" target=\"_blank\" title=\"GeneCards Link\">{g}'.format(g=atoms[i])
-
-            gene_card = '{}{}</a>'.format(multiline, atoms[i])
+            gene_card = '<a href=\"http://www.genecards.org/index.php?path=/Search/keyword/{g}\" target=\"_blank\" title=\"GeneCards Link\">{g}'.format(g=atoms[i])
 
             # construct additional links out
             gene_str_extension = '<br><font size=-2>'
 
             if atoms[i].lower() in md_anderson_genes:
-                gene_str_extension += '<a href=\"{link}\" target=\"_blank\"' + \
-                    'title=\"MDAnderson Cancer Center\">MDAnderson</a>'.format(
+                gene_str_extension += '<a href=\"{link}\" target=\"_blank\" title=\"MDAnderson Cancer Center\">MDAnderson</a>'.format(
                         link=md_anderson_genes[atoms[i].lower()])
 
             if atoms[i].upper() in eMERGE_genelist:
