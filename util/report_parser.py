@@ -73,25 +73,76 @@ def json_from_report(filename):
     return data
 
 def json_from_ajax(db_response):
-    records = db_response.values()
-
-    if len(records) == 0:
+    # Make sure query returned some data
+    # If not, report back empty
+    if len(db_response) == 0:
         return ''
 
-    cols = []
-    for header in records[0]:
-        cols.append(header)
+    # Pull headers, sort into alphabetical order
+    # This is so it's in the same order returned
+    # by Variant._meta.get_all_field_names()
+    headers = []
+    for header in db_response.values()[0]:
+        headers.append(header)
+    headers.sort()
 
-    vals = []
-    for record in records:
-        r = []
-        for col in record:
-            r.append(record[col])
-        vals.append(r)
+    # Grab and store pre-rearranged indexes of relevant headers
+    col_order = [headers.index('chrom'), headers.index('pos'), headers.index('gene_name'), headers.index('ref'),
+                  headers.index('alt'), headers.index('normal_ref_count'), headers.index('normal_alt_count'),
+                  headers.index('tumor_ref_count'), headers.index('tumor_alt_count')]
 
-    return tablib.Dataset(*vals, headers=cols).html
+    # Rearrage headers
+    new_headers = []
+    for i in col_order:
+        new_headers.append(headers[i])
+        headers[i] = None
+    map(lambda x: new_headers.append(x) if x else False, headers)
+    headers = new_headers
 
+    # Append extra headers to front
+    headers.insert(0, 'BnIDs')
+    headers.insert(0, 'sample')
+    headers.insert(0, 'study')
 
+    # Parse list of variant records
+    variant_records = []
+    for variant in db_response:
+        # Get all field names, delete report object
+        field_names = Variant._meta.get_all_field_names()
+        del field_names[field_names.index('report')]
+
+        # Pull relevent fields from variant object
+        record = []
+        for key in field_names:
+            if key in variant.__dict__:
+                record.append(variant.__dict__[key])
+
+        # Replace all None with empty string
+        record = ['' if elem is None else elem for elem in record]
+
+        # Sort the records into desired order
+        new_record = []
+        for i in col_order:
+            new_record.append(record[i])
+            record[i] = None
+        map(lambda x: new_record.append(x) if x is not None else False, record)
+        record = new_record
+
+        # Append extra data to front
+        bnids, samples = [], set()
+        for bnid in variant.report.bnids.all():
+            bnids.append(bnid.bnid)
+            samples.add(bnid.sample.name)
+        bnids = map(str, bnids)
+        samples = map(str, samples)
+        study = variant.report.study.name
+        record = [study, str(samples), str(bnids)] + record
+
+        # Append this record to list of all records
+        variant_records.append(record)
+
+    # Return as an html table
+    return tablib.Dataset(*variant_records, headers=headers).html
 
 
 def load_into_db(report):

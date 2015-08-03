@@ -1,34 +1,48 @@
 {% extends "viewer/base.html" %}
 {% load staticfiles %}
 {% block extra_js %}
-
+<script type="text/javascript">
+$(document).ready(function(){
+    new jBox('Modal', {
+        attach: $('.modal_button'),
+        content: $('#modal_box'),
+        overlay: true,
+        closeOnClick: 'overlay',
+        closeButton: 'box'
+    });
+});
+</script>
 {% endblock %}
 
 {% block content %}
-<div class="container" style="text-align: 'center'">
-	<p>
-	<h2>Create a new Study</h2>
+<!-- Modal box content -->
+<div class="container" id="modal_box" style="display:none">
+	<h2>Create a New Study</h2>
 	<form action="/viewer/new_study/" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
-		<table>
-			{{ study_form.as_table }}
-		</table>
-		<input type="submit" class="btn btn-primary" value="Create" />
+		{% for field in study_form %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                {{ field.label_tag }}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create
+                </button>
+            </div>
+        </div>
 	</form>
-	<br>
+	<br/>
 </div>
-<hr>
-<div class="container" style="text-align: 'center'">
-	<h3>Available Studies:</h3>
-	<!-- .modal -->
-	<div class="modal fade" id="sampleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-sm">
-    		<div class="modal-content">
-
-			</div>
-		</div>
-	</div>
-	<!-- /.modal -->
+<!-- End Modal box content -->
+<div class="container">
+    <h2>Available Studies:</h2>
 	<table class="table table-hover">
 		<thead>
 			<tr>
@@ -47,13 +61,9 @@
 				{% endfor %}
 			</tbody>
 	</table>
-		<script type="text/javascript">
-            var form_options = {
-				target: '#sampleModal',
-                success: function() { }
-            }
-            $('#study_edit_form').ajaxForm(form_options);
-        </script>
+    <button type="button" class="btn btn-primary btn-sm modal_button">
+        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create New Study
+    </button>
 </div>
 
 {% endblock %}

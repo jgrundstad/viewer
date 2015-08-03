@@ -267,6 +267,7 @@ def get_bnids_by_study(request, study_id=None):
 def load_variants(request, report_id=None):
     print "Load Variants for Report ID: {}".format(report_id)
     report_obj = Report.objects.get(pk=report_id)
+    print report_obj.bnids.first().id
     report_parser.load_into_db(report_obj)
     return HttpResponseRedirect('/viewer/upload_report/')
 
@@ -274,7 +275,6 @@ def load_variants(request, report_id=None):
 @user_passes_test(in_proj_user_group)
 def search_reports(request):
     variant_fields = Variant._meta.get_all_field_names()
-    db_lookup = ''
     context = {'variant_fields':variant_fields}
     return render(request, 'viewer/search_reports.html', context)
 
@@ -284,6 +284,7 @@ def search_reports(request):
 def ajax_search_reports(request, search_col, search_term, search_type):
     db_lookup = '%s__%s' % (search_col, search_type)
     variants = Variant.objects.filter(**{db_lookup: search_term})
+    #print variants[0].report.study.description
     # from django.core import serializers
     # vars = serializers.serialize('json', variants)
     return report_parser.json_from_ajax(variants)

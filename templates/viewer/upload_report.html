@@ -17,25 +17,48 @@ jQuery(document).ready(function(){
             }
         );
     });
+
+    $('select[name=bnids]').empty();
+
+    new jBox('Modal', {
+        attach: $('.modal_button'),
+        content: $('#modal_box'),
+        overlay: true,
+        closeOnClick: 'overlay',
+        closeButton: 'box'
+    });
 });
 </script>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-	<p>
-	<h2>Upload a new Variant Report</h2>
+<!-- Modal box content -->
+<div class="container" id="modal_box" style="display:none">
+	<h2>Upload a New Variant Report</h2>
 	<form name='upload_report_form' action="/viewer/upload_report/" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
-		<table>
-			{{ report_form.as_table }}
-		</table>
-		<p><input type="submit" class="btn btn-primary" value="Create" /> </p>
+        {% for field in report_form %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                {{ field.label_tag }}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-cloud-upload"></span>&nbsp;&nbsp;Upload
+                </button>
+            </div>
+        </div>
 	</form>
-	<br>
+	<br/>
 </div>
-<hr>
-<div id="the_rest" class="container" style="text-align: 'center';">
+<!-- End Modal box content -->
+<div class="container">
 	<h3>Available Variant Reports:</h3>
 	<table id="available" class="table table-hover tablesorter">
 		<thead>
@@ -75,12 +98,17 @@ jQuery(document).ready(function(){
 					<form action="/viewer/load_variants/{{r.id}}/" method="POST">
 						{% csrf_token %}
 						<input type="hidden" name="Load" id="load-{{r.id}}" value="Load"/>
-						<input type="submit" value="Load into DB"/>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <span class="fa fa-database"></span>&nbsp;&nbsp;Load into DB
+                        </button>
 					</form>
 				</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
+    <button type="button" class="btn btn-primary btn-sm modal_button">
+        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Upload New Variant Report
+    </button>
 </div>
 {% endblock %}
