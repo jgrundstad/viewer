@@ -21,6 +21,10 @@
         <script type="text/javascript" src="{% static 'js/dataTables.colReorder.js' %}"></script>
         <link href="{% static 'css/dataTables.colVis.css' %}" rel="stylesheet" media="screen">
         <script type="text/javascript" src="{% static 'js/dataTables.colVis.js' %}"></script>
+
+        <!-- Custom js and css -->
+        <link href="{% static 'css/viewer.css' %}" rel="stylesheet" media="screen">
+
         {% block extra_js %}
         {% endblock %}
         <script type="text/javascript">
@@ -56,7 +60,7 @@
                     <div class="collapse navbar-collapse" id="navbar-collapse-1">
                         <ul class="nav navbar-nav">
                             <li><a href="/viewer/">Home</a></li>
-                            <li><a href="/viewer/new_study/">Studies</a></li>
+                            <li><a href="/viewer/study/view_study/">Studies</a></li>
                             <li><a href="/viewer/new_sample/">Samples</a></li>
                             <li><a href="/viewer/new_bionimbus_id/">Bionimbus IDs</a></li>
                             <li><a href="/viewer/upload_report/">Reports</a></li>

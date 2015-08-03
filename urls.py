@@ -33,9 +33,12 @@ urlpatterns = patterns('',
                            views.edit_sample, name='sample_edit'),
 
                        # Study
-                       url(r'^new_study/$', views.new_study, name='new_study'),
-                       url(r'study_edit/(?P<study_id>\d+)/$',
-                           views.edit_study, name='study_edit'),
+                       url(r'^study/view_study/$', views.view_study, name='view_study'),
+                       url(r'^study/new_study/$', views.new_study, name='new_study'),
+                       url(r'^study/edit_study/(?P<study_id>\d+)/$',
+                           views.edit_study, name='edit_study'),
+                       url(r'^study/delete_study/(?P<study_id>\d+)/$',
+                           views.delete_study, name='delete_study'),
 
                        # Report
                        url(r'^upload_report/$', views.upload_report,

@@ -88,6 +88,16 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/viewer/')
 
+'''
+Study model
+'''
+@user_passes_test(in_proj_user_group)
+def view_study(request):
+    studies = Study.objects.all()
+    context = {'studies': studies}
+    context.update(csrf(request))
+    return render_to_response('viewer/study/view_study.html', context,
+                              context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
 def new_study(request):
@@ -95,14 +105,12 @@ def new_study(request):
         sform = StudyForm(request.POST, instance=Study())
         if sform.is_valid():
             sform.save()
-        return HttpResponseRedirect('/viewer/new_study/')
+        return HttpResponseRedirect('/viewer/study/view_study/')
     else:
         sform = StudyForm(instance=Study())
         context = {'study_form': sform}
-        studies = Study.objects.all()
-        context['studies'] = studies
         context.update(csrf(request))
-        return render_to_response('viewer/new_study.html', context,
+        return render_to_response('viewer/study/new_study.html', context,
                                   context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
@@ -112,15 +120,30 @@ def edit_study(request, study_id):
         updated_form = StudyForm(request.POST, instance=s)
         if updated_form.is_valid():
             updated_form.save()
-            return HttpResponseRedirect('/viewer/new_study/')
+            return HttpResponseRedirect('/viewer/study/view_study/')
     else:
         study_obj = Study.objects.get(pk=study_id)
         sform = StudyForm(instance=study_obj)
         context = {'study_form': sform, 'name': study_obj.name, 'pk': study_obj.pk}
         context.update(csrf(request))
-        return render_to_response('viewer/study_edit.html', context,
+        return render_to_response('viewer/study/edit_study.html', context,
                                   context_instance=RequestContext(request))
 
+@user_passes_test(in_proj_user_group)
+def delete_study(request, study_id):
+    if request.method == 'POST':
+        Study.objects.get(pk=study_id).delete()
+        return HttpResponseRedirect('/viewer/study/view_study/')
+    else:
+        study_obj = Study.objects.get(pk=study_id)
+        context = {'name': study_obj.name, 'pk': study_obj.pk}
+        context.update(csrf(request))
+        return render_to_response('viewer/study/delete_study.html', context,
+                                  context_instance=RequestContext(request))
+
+'''
+Bionimbus ID model
+'''
 @user_passes_test(in_proj_user_group)
 def new_bionimbus_id(request): #study_id=None, **kwargs):
     #if study_id:
@@ -139,7 +162,7 @@ def new_bionimbus_id(request): #study_id=None, **kwargs):
         bnids = Bnid.objects.all().order_by('-bnid')
         context['bnids'] = bnids
         context.update(csrf(request))
-        return render_to_response('viewer/new_bionimbus_id.html', context,
+        return render_to_response('viewer/bnid/new_bionimbus_id.html', context,
                                   context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
@@ -155,9 +178,12 @@ def edit_bionimbus_id(request, bnid_id):
         bform = BnidForm(instance=bnid_obj)
         context = {'bnid_form': bform, 'bnid': bnid_obj.bnid, 'pk': bnid_obj.pk}
         context.update(csrf(request))
-        return render_to_response('viewer/bnid_edit.html', context,
+        return render_to_response('viewer/bnid/bnid_edit.html', context,
                                   context_instance=RequestContext(request))
 
+'''
+Sample model
+'''
 @user_passes_test(in_proj_user_group)
 def new_sample(request):
     if request.method == 'POST':
@@ -171,7 +197,7 @@ def new_sample(request):
         samples = Sample.objects.all()
         context['samples'] = samples
         context.update(csrf(request))
-        return render_to_response('viewer/new_sample.html', context,
+        return render_to_response('viewer/sample/new_sample.html', context,
                                   context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
@@ -187,9 +213,12 @@ def edit_sample(request, sample_id):
         sform = SampleForm(instance=sample_obj)
         context = {'sample_form': sform, 'name': sample_obj.name, 'pk': sample_obj.pk}
         context.update(csrf(request))
-        return render_to_response('viewer/sample_edit.html', context,
+        return render_to_response('viewer/sample/sample_edit.html', context,
                                   context_instance=RequestContext(request))
 
+'''
+Report model
+'''
 @user_passes_test(in_proj_user_group)
 def upload_report(request):
     if request.method == 'POST':
@@ -211,7 +240,7 @@ def upload_report(request):
         reports = Report.objects.all()
         context['reports'] = reports
         context.update(csrf(request))
-        return render_to_response('viewer/upload_report.html', context,
+        return render_to_response('viewer/report/upload_report.html', context,
                                   context_instance=RequestContext(request))
 
 
@@ -234,7 +263,7 @@ def view_report(request, file_id):
                'filename': report_obj.report_file.name.split('/')[1],
                'study': report_obj.bnids.first().sample.study,
                'report_obj': report_obj}
-    return render_to_response('viewer/view_report.html', context,
+    return render_to_response('viewer/report/view_report.html', context,
                               context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
@@ -276,7 +305,7 @@ def load_variants(request, report_id=None):
 def search_reports(request):
     variant_fields = Variant._meta.get_all_field_names()
     context = {'variant_fields':variant_fields}
-    return render(request, 'viewer/search_reports.html', context)
+    return render(request, 'viewer/search/search_reports.html', context)
 
 
 @user_passes_test(in_proj_user_group)
