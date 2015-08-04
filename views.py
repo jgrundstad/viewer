@@ -35,8 +35,8 @@ def register(request):
             lastname = user_form['last_name'].value()
             subject = 'Report Viewer Registration: {}, {}'.format(
                 lastname, firstname)
-            message = 'User {} {} has registered and needs to be vetted.'.format(
-                firstname, lastname)
+            message = 'User {} {} <{}> has registered and needs to be vetted.'.format(
+                firstname, lastname, user.email)
             send_mail(subject, message, 'jgrundstad@uchicago.edu',
                       ['jgrundstad@uchicago.edu'], fail_silently=False)
         else:
