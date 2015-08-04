@@ -12,6 +12,10 @@ class Study(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'studies'
+
+
 
 class Caller(models.Model):
     name = models.CharField(max_length=64, verbose_name="Caller Name")
