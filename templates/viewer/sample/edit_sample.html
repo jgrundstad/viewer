@@ -1,8 +1,8 @@
 <div class="container">
-	<h2>Create a New Sample</h2>
-	<form action="/viewer/sample/new_sample/" method="post" enctype="multipart/form-data">
+	<h2>Edit Sample: {{ name }}</h2>
+    <form enctype="multipart/form-data" method="post" action="/viewer/sample/edit_sample/{{ pk }}/">
 		{% csrf_token %}
-		{% for field in sample_form %}
+        {% for field in sample_form %}
         <div class="row" style="margin-bottom:8px">
             <div class="col-sm-2">
                 {{ field.label_tag }}
@@ -15,10 +15,10 @@
         <div class="row">
             <div class="col-sm-6 col-sm-offset-2">
                 <button type="submit" class="btn btn-primary">
-                    <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create
+                    <span class="fa fa-pencil-square-o"></span>&nbsp;&nbsp;Update
                 </button>
             </div>
         </div>
 	</form>
-	<br/>
+	<br>
 </div>

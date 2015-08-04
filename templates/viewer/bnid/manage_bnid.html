@@ -7,7 +7,7 @@ $(document).ready(function(){
     new jBox('Modal', {
         attach: $('.igsbviewer-modal-add-button'),
         ajax: {
-            url: '/viewer/study/new_study'
+            url: '/viewer/bnid/new_bnid'
         },
         overlay: true,
         closeOnClick: 'overlay',
@@ -15,7 +15,7 @@ $(document).ready(function(){
     });
 
     /* Set up 'edit' and 'delete' modal boxes */
-    var pk = 1;
+    var pk = 0;
     var $modalEditButton = $('.igsbviewer-modal-edit-button');
     var $modalDeleteButton = $('.igsbviewer-modal-delete-button');
     $modalEditButton.click(function(){
@@ -26,10 +26,9 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/study/edit_study/' + pk;
+            this.options.ajax.url = '/viewer/bnid/edit_bnid/' + pk;
         },
         ajax: {
-            url: '/viewer/study/edit_study/' + pk,
             reload: true
         },
         attach: $modalEditButton,
@@ -39,10 +38,9 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/study/delete_study/' + pk;
+            this.options.ajax.url = '/viewer/bnid/delete_bnid/' + pk;
         },
         ajax: {
-            url: '/viewer/study/delete_study/' + pk,
             reload: true
         },
         attach: $modalDeleteButton,
@@ -56,32 +54,38 @@ $(document).ready(function(){
 
 {% block content %}
 <div class="container">
-    <h2>Available Studies:</h2>
+    <h2>Available Bionimbus IDs:</h2>
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th>Study Name</th>
-                <th class="col-xs-4">Description</th>
-				<th>Created On</th>
+				<th>Study</th>
+				<th>Sample</th>
+				<th>Sample Desc.</th>
+				<th>Bionimbus ID</th>
+				<th>BnID Desc.</th>
+				<th>Creation Date</th>
                 <th>&nbsp;</th>
 			</tr>
 		</thead>
 			<tbody>
-				{% for s in studies %}
+				{% for b in bnids %}
 				<tr>
-					<td>{{s}}</td>
-					<td>{{s.description}}</td>
-					<td>{{s.creation_date}}</td>
+					<td>{{b.sample.study}}</td>
+                    <td>{{b.sample.name}}</td>
+                    <td>{{b.sample.description}}</td>
+                    <td>{{b.bnid}}</td>
+                    <td>{{b.description}}</td>
+                    <td>{{b.creation_date}}</td>
                     <td>
-                        <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{s.pk}}"></span>&nbsp;&nbsp;
-                        <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{s.pk}}"></span>
+                        <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{b.pk}}"></span>&nbsp;&nbsp;
+                        <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{b.pk}}"></span>
                     </td>
 				</tr>
 				{% endfor %}
 			</tbody>
 	</table>
     <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
-        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create New Study
+        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create New Bionimbus ID
     </button>
 </div>
 

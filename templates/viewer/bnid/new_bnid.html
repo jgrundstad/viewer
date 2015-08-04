@@ -1,8 +1,18 @@
 <div class="container">
-	<h2>Create a New Sample</h2>
-	<form action="/viewer/sample/new_sample/" method="post" enctype="multipart/form-data">
-		{% csrf_token %}
-		{% for field in sample_form %}
+	<h2>Create a New Bionimbus ID</h2>
+    <form action="/viewer/bnid/new_bnid/" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in study_selector_form %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                {{ field.label_tag }}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        {% for field in bnid_form %}
         <div class="row" style="margin-bottom:8px">
             <div class="col-sm-2">
                 {{ field.label_tag }}
@@ -19,6 +29,6 @@
                 </button>
             </div>
         </div>
-	</form>
+    </form>
 	<br/>
 </div>
