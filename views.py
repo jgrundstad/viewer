@@ -8,7 +8,7 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 import simplejson
 
-from django_ajax.decorators import ajax
+#from django_ajax.decorators import ajax
 
 from forms import BnidForm, SampleForm, ReportForm, StudyForm, UserForm
 from forms import StudySelectorForm
@@ -322,14 +322,15 @@ def search_reports(request):
 
 
 @user_passes_test(in_proj_user_group)
-@ajax
+#@ajax
 def ajax_search_reports(request, search_col, search_term, search_type):
     db_lookup = '%s__%s' % (search_col, search_type)
     variants = Variant.objects.filter(**{db_lookup: search_term})
     #print variants[0].report.study.description
     # from django.core import serializers
     # vars = serializers.serialize('json', variants)
-    return report_parser.json_from_ajax(variants)
+    return HttpResponse(report_parser.json_from_ajax(variants))
+    #return report_parser.json_from_ajax(variants)
 
 
 '''

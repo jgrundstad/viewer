@@ -37,15 +37,16 @@ $(document).ready(function(){
         }, function(data){
             /* Run function once data is received */
             $loading_cloud.hide();
-            if(data.status >= 200 && data.status < 300){
+            if(true/*data.status >= 200 && data.status < 300*/){
                 $table_container.empty().show();
                 /* If content came back empty, report no results to user */
-                if(data.content === ''){
+                if(data/*.content*/ === ''){
                     $('#no_results').show().children('span').addClass('pulse');
                 }else{
                     /* If content came back, format into DataTable */
+                    console.log(data);
                     var table_id = 'report-table';
-                    var $result_table = $(data.content).prop({
+                    var $result_table = $(data/*.content*/).prop({
                         'class': 'table table-hover',
                         'id': table_id
                     }).appendTo('#table_container');
