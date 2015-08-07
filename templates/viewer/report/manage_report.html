@@ -111,7 +111,9 @@ jQuery(document).ready(function(){
                 <td>
                     <form action="/viewer/edit_report/{{r.id}}/" method="POST">
                         <input type="hidden" name="Edit" id="{{r.id}}" value="Edit"/>
-                        <input type="submit" value="Upload"/>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <span class="fa fa-upload"></span>&nbsp;&nbsp;Upload File
+                        </button>
                     </form>
                 </td>
                 {% endif %}
