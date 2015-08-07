@@ -122,7 +122,7 @@ jQuery(document).ready(function(){
 					<form action="/viewer/load_variants/{{r.id}}/" method="POST">
 						{% csrf_token %}
 						<input type="hidden" name="Load" id="load-{{r.id}}" value="Load"/>
-                        <button type="submit" class="btn btn-sm btn-primary">
+                        <button type="submit" class="btn btn-sm btn-primary" disabled>
                             <span class="fa fa-database"></span>&nbsp;&nbsp;Load into DB
                         </button>
 					</form>

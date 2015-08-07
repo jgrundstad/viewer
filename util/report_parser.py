@@ -162,6 +162,7 @@ def json_from_ajax(db_response):
 
 
 def load_into_db(report):
+    print "{}/{}".format(settings.MEDIA_ROOT, report.report_file.name)
     report_file = open(settings.MEDIA_ROOT + report.report_file.name, 'r')
     header_line = report_file.readline().strip()
     splitby =','

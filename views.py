@@ -368,7 +368,7 @@ def load_variants(request, report_id=None):
     report_obj = Report.objects.get(pk=report_id)
     print report_obj.bnids.first().id
     report_parser.load_into_db(report_obj)
-    return HttpResponseRedirect('/viewer/upload_report/')
+    return HttpResponseRedirect('/viewer/report/')
 
 
 
