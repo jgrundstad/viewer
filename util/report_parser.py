@@ -168,7 +168,7 @@ def load_into_db(report):
     splitby =','
     if '\t' in header_line:
         splitby = '\t'
-    cols = header_line.split(splitby)
+    cols = [x.lower() for x in header_line.split(splitby)]
     print "cols: {}".format(cols)
 
     for line in report_file:
@@ -187,7 +187,8 @@ def load_into_db(report):
             variant.ref = toks[cols.index('ref')]
             variant.alt = toks[cols.index('alt')]
             variant.context = toks[cols.index('context')]
-            variant.dbSnp_id = toks[cols.index('dbSnp_id')]
+            if 'dbSnp_id' in cols:
+                variant.dbSnp_id = toks[cols.index('dbSnp_id')]
             variant.gene_name = toks[cols.index('gene')]
             variant.effect = toks[cols.index('effect')]
             variant.coding = toks[cols.index('coding')]

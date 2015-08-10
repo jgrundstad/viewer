@@ -89,7 +89,7 @@ class Variant(models.Model):
                                           blank=True, null=True)
     tumor_alt_count = models.IntegerField(verbose_name='Tumor Alt Count',
                                           blank=True, null=True)
-    dbSnp_id = models.CharField(max_length=16, verbose_name='dbSnp ID',
+    dbsnp_id = models.CharField(max_length=16, verbose_name='dbSnp ID',
                                 blank=True, null=True)
     gene_name = models.CharField(max_length=32, verbose_name='Gene Name',
                                  blank=True, null=True)
