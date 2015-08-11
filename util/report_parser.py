@@ -1,3 +1,5 @@
+import shutil
+
 __author__ = 'Jason Grundstad'
 from django.conf import settings
 import json
@@ -5,8 +7,50 @@ import os
 import tablib
 from viewer.models import Variant, Report
 
+variant_headers = {'chr': 'str', 'pos': 'int', 'ref': 'str', 'alt': 'str',
+                   'normal_ref_count': 'int', 'normal_alt_count': 'int',
+                   '%_normal_alt': 'float', 'tumor_ref_count': 'int',
+                   'tumor_alt_count': 'int', '%_tumor_alt': 'float',
+                   't/n_%_alt_ratio': 'float', 'gene': 'str'}
+
+def get_header_cols_and_delim(filehandle):
+    """
+    Return header content, as well as the delimiter
+    :param filehandle:
+    :return:
+    """
+    header_line = filehandle.readline().strip()
+    splitby = ','
+    if '\t' in header_line:
+        splitby = '\t'
+    cols = [x.lower() for x in header_line.split(splitby)]
+    return {'cols': cols, 'delim': splitby }
+
+
+def classify_headers(header_list):
+    """
+    compare headers from a file to those expected by the database.  Any column
+    not accounted for will be sent back in a separate list, and stored in a
+    string: effect=EXON;coding=CODING;
+    :param header_list: list of column headers
+    :returns list of lists: [[canonical headers], [non-canonical headers]]
+    """
+    canonical = []
+    for h in variant_headers:
+        if h in header_list:
+            canonical.append(h)
+            del header_list[header_list.index(h)]
+    return [canonical, header_list]
+
 
 def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
+    """
+    Process a line of a report, add html links out, gene list tags, etc
+    :param atoms: record content in a list
+    :param headers: corresponding header titles
+    :param md_anderson_genes: dict of gene-names: URLs
+    :param eMERGE_genelist: dict of gene-names
+    """
     for i in range(0, len(headers)):
         if not atoms[i]:
             atoms[i] = ''
@@ -38,9 +82,11 @@ def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
 
     return atoms
 
+
 def get_mdanderson_genes():
     with open(settings.LINKS_OUT + 'mdanderson.json', 'r') as md_f:
         return json.loads(json.load(md_f))
+
 
 def get_eMERGE_genelist():
     eMERGE_genelist = []
@@ -51,22 +97,19 @@ def get_eMERGE_genelist():
                 eMERGE_genelist.append(gene)
     return eMERGE_genelist
 
+
 def json_from_report(filename):
     print "%s - creating json from: %s" % (os.getcwd(), filename)
     report_file = open(filename, 'r')
-    header_line = report_file.readline().strip()
-    splitby = ','
-    if '\t' in header_line:
-        splitby = '\t'
-    cols = header_line.split(splitby)
+    header_line_dict = get_header_cols_and_delim(report_file)
+    cols = header_line_dict['cols']
+    splitby = header_line_dict['delim']
 
     md_anderson_genes = get_mdanderson_genes()
     eMERGE_genelist = get_eMERGE_genelist()
 
     d = []
     for line in report_file:
-        # remove '%' character to allow numerical sorting on pct columns
-        #line = line.replace('%', '')
         tokens = line.rstrip('\n').split(splitby)
         if len(tokens) > 1:
             if 'INTRON' not in line and 'INTERGENIC' not in line:
@@ -162,36 +205,77 @@ def json_from_ajax(db_response):
 
 
 def load_into_db(report):
+    #TODO
+    '''Check to see if this report has already been uploaded
+    if so, replace?'''
     print "{}/{}".format(settings.MEDIA_ROOT, report.report_file.name)
     report_file = open(settings.MEDIA_ROOT + report.report_file.name, 'r')
-    header_line = report_file.readline().strip()
-    splitby =','
-    if '\t' in header_line:
-        splitby = '\t'
-    cols = [x.lower() for x in header_line.split(splitby)]
-    print "cols: {}".format(cols)
+    header_line_dict = get_header_cols_and_delim(report_file)
+    headers = header_line_dict['cols']
+    canonical, extra_headers = classify_headers(headers)
+    splitby = header_line_dict['delim']
+
+    print "headers: {}".format(headers)
 
     for line in report_file:
-        toks = line.rstrip('\n').split(splitby)
-        if len(toks) > 1:
+        data = line.rstrip('\n').split(splitby)
+        if len(data) > 1:
             variant = Variant()
-            # skip over missing Int fields
-            for intfield in ['pos', 'normal_ref_count', 'normal_alt_count',
-                             'tumor_ref_count', 'tumor_alt_count',
-                             'amino_acid_length']:
-                if toks[cols.index(intfield)]:
-                    setattr(variant, intfield, int(toks[cols.index(intfield)]))
 
             variant.report = report
-            variant.chrom = toks[cols.index('chr')]
-            variant.ref = toks[cols.index('ref')]
-            variant.alt = toks[cols.index('alt')]
-            variant.context = toks[cols.index('context')]
-            if 'dbSnp_id' in cols:
-                variant.dbSnp_id = toks[cols.index('dbSnp_id')]
-            variant.gene_name = toks[cols.index('gene')]
-            variant.effect = toks[cols.index('effect')]
-            variant.coding = toks[cols.index('coding')]
-            variant.codon_change = toks[cols.index('codon_change')]
-            variant.amino_acid_change = toks[cols.index('amino_acid_change')]
+            # process canonical
+            for h in canonical:
+                # process the ints
+                if variant_headers[h] == 'int':
+                    if data[headers.index(h)]:
+                        setattr(variant, h, int(data[headers.index(h)]))
+                # process the floats
+                elif variant_headers[h] == 'float':
+                    field = h
+                    if '%' in h:
+                        field = h.replace('%', 'pct')
+                    if data[headers.index(h)]:
+                        setattr(variant, field, float(data[headers.index(h)]))
+                # process the strings
+                elif variant_headers[h] == 'str':
+                    field = h
+                    if h == 'chr':
+                        field = 'chrom'
+                    setattr(variant, field, data[headers.index(h)])
+            # process extra fields
+            extra_headers_list = []
+            for eh in extra_headers:
+                extra_headers_list.append(
+                    '{}={}'.format(eh, data[headers.index[eh]])
+                )
+            variant.extra_info = ';'.join(extra_headers_list)
             variant.save()
+
+
+def report_file_formatter(filename):
+    shutil.copy(os.path.join(settings.MEDIA_ROOT, filename),
+                os.path.join(settings.MEDIA_ROOT, 'original_files',
+                             filename)
+                )
+    report_file = open(os.path.join(settings.MEDIA_ROOT, filename), 'r')
+    header_line_dict = get_header_cols_and_delim(report_file)
+    temp_report_file = open(os.path.join(
+        settings.MEDIA_ROOT, filename, '.tmp'),
+        'w'
+    )
+
+    # start off in all lowercase
+    cols = [x.lower() for x in header_line_dict['cols']]
+
+    # check for mandatory columns: chr, pos, ref, alt
+    missing_list = []
+    for c in ['chr', 'pos', 'ref', 'alt']:
+        if c not in cols:
+            missing_list.append(c)
+    if len(missing_list) > 0:
+        msg = "ERROR: Mandatory columns [{}] missing from report file " + \
+              "headers\n{}"
+        print msg.format(', '.join(missing_list), cols)
+    else:
+        pass
+        # load into db?
