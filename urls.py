@@ -15,6 +15,15 @@ urlpatterns = patterns('',
                            name='restricted'),
                        url(r'^permission/$', views.permission,
                            name='permission'),
+                       url(r'^users/change-password/', 'django.contrib.auth.views.password_change',
+                           {
+                               'template_name': 'viewer/change_password.html',
+                               'post_change_redirect': '/viewer/users/change-password-done/',
+                           }, name='change-password'),
+                       url(r'^users/change-password-done/', 'django.contrib.auth.views.password_change_done',
+                           {
+                               'template_name': 'viewer/change_password_done.html'
+                           }, name='change-password-done'),
 
                        # Bnid
                        url(r'^bnid/$',
