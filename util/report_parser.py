@@ -2,16 +2,52 @@ import shutil
 
 __author__ = 'Jason Grundstad'
 from django.conf import settings
+from viewer.models import Variant, Report
 import json
 import os
 import tablib
-from viewer.models import Variant, Report
 
-variant_headers = {'chr': 'str', 'pos': 'int', 'ref': 'str', 'alt': 'str',
-                   'normal_ref_count': 'int', 'normal_alt_count': 'int',
-                   '%_normal_alt': 'float', 'tumor_ref_count': 'int',
-                   'tumor_alt_count': 'int', '%_tumor_alt': 'float',
-                   't/n_%_alt_ratio': 'float', 'gene': 'str'}
+
+variant_headers = {'chr': 'str',
+                   'pos': 'int',
+                   'ref': 'str',
+                   'alt': 'str',
+                   'normal_ref_count': 'int',
+                   'normal_alt_count': 'int',
+                   'pct_normal_alt': 'float',
+                   'tumor_ref_count': 'int',
+                   'tumor_alt_count': 'int',
+                   'pct_tumor_alt': 'float',
+                   't/n_pct_alt_ratio': 'float',
+                   'gene': 'str'}
+
+
+def get_media_path():
+    """
+    The path to /viewer/files is different in DEBUG vs Non-DEBUG
+    :return:
+    """
+    if settings.DEBUG:
+        media_path = settings.MEDIA_ROOT
+    else:
+        media_path = settings.MEDIA_URL
+    print "settings.DEBUG is {}, set media_path to: {}".format(settings.DEBUG,
+                                                               media_path)
+    return media_path
+
+
+def is_loaded(report):
+    """
+    Return true if variants for this report are loaded in the db
+    :param report:
+    :return:
+    """
+    if report.pk in list(set(
+            Variant.objects.values_list('report', flat=True))):
+        return True
+    else:
+        return False
+
 
 def get_header_cols_and_delim(filehandle):
     """
@@ -20,10 +56,12 @@ def get_header_cols_and_delim(filehandle):
     :return:
     """
     header_line = filehandle.readline().strip()
+    #print "Header line: {}".format(header_line)
     splitby = ','
     if '\t' in header_line:
         splitby = '\t'
-    cols = [x.lower() for x in header_line.split(splitby)]
+    cols = header_line.split(splitby)
+    #print "Split cols: {}".format(cols)
     return {'cols': cols, 'delim': splitby }
 
 
@@ -36,11 +74,13 @@ def classify_headers(header_list):
     :returns list of lists: [[canonical headers], [non-canonical headers]]
     """
     canonical = []
-    for h in variant_headers:
-        if h in header_list:
+    extra = []
+    for h in header_list:
+        if h in variant_headers:
             canonical.append(h)
-            del header_list[header_list.index(h)]
-    return [canonical, header_list]
+        else:
+            extra.append(h)
+    return (canonical, extra)
 
 
 def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
@@ -204,20 +244,78 @@ def json_from_ajax(db_response):
     return tablib.Dataset(*variant_records, headers=headers).html
 
 
+def report_file_formatter(filename):
+    """
+    Fix column headers, and check for missing required columns
+    :param filename: string of just the name, no path
+    :return checks_out: boolean, True - formatted and works, False - bad
+    """
+    checks_out = True
+    # make a copy of the original
+    media_path = get_media_path()
+    shutil.copy(os.path.join(media_path, filename),
+                os.path.join(media_path, 'original_files',
+                             filename)
+                )
+    report_file = open(os.path.join(media_path, filename), 'r')
+    header_line_dict = get_header_cols_and_delim(report_file)
+    delimiter = header_line_dict['delim']
+
+    # start off in all lowercase
+    cols = [x.lower() for x in header_line_dict['cols']]
+    cols = [x.replace('%', 'pct') for x in cols]
+
+    # check for mandatory columns: chr, pos, ref, alt
+    missing_list = []
+    for c in ['chr', 'pos', 'ref', 'alt']:
+        if c not in cols:
+            missing_list.append(c)
+
+    if len(missing_list) > 0:
+        msg = "ERROR: Mandatory columns [{}] missing from report file " + \
+              "headers\n{}"
+        print msg.format(', '.join(missing_list), cols)
+        checks_out = False
+    else:
+        # print to temp file
+        temp_report_file = open(os.path.join(media_path, filename + '.tmp'),'w')
+
+        print >>temp_report_file, delimiter.join(cols)
+        for line in report_file:
+            print >>temp_report_file, line.rstrip()
+        shutil.move(os.path.join(media_path, filename + '.tmp'),
+                    os.path.join(media_path, filename)
+                    )
+
+    return checks_out
+
+
 def load_into_db(report):
-    #TODO
-    '''Check to see if this report has already been uploaded
-    if so, replace?'''
-    print "{}/{}".format(settings.MEDIA_ROOT, report.report_file.name)
-    report_file = open(settings.MEDIA_ROOT + report.report_file.name, 'r')
+    """
+    If report hasn't been loaded, and fits format, bulk load into db
+    :param report:
+    :return boolean:
+    """
+    if is_loaded(report):
+        return False
+
+    media_path = get_media_path()
+    print "{}/{}".format(media_path, report.report_file.name)
+
+    checks_out = report_file_formatter(report.report_file.name)
+    if checks_out:
+        print "{} checks out.".format(media_path + report.report_file.name)
+
+    report_file = open(media_path + report.report_file.name, 'r')
     header_line_dict = get_header_cols_and_delim(report_file)
     headers = header_line_dict['cols']
-    canonical, extra_headers = classify_headers(headers)
+    (canonical, extra_headers) = classify_headers(headers)
+    print "Canonical: {}\nExtra: {}".format(canonical, extra_headers)
     splitby = header_line_dict['delim']
 
-    print "headers: {}".format(headers)
-
+    all_variants = []
     for line in report_file:
+        #print "line: {}".format(line)
         data = line.rstrip('\n').split(splitby)
         if len(data) > 1:
             variant = Variant()
@@ -225,57 +323,43 @@ def load_into_db(report):
             variant.report = report
             # process canonical
             for h in canonical:
-                # process the ints
-                if variant_headers[h] == 'int':
-                    if data[headers.index(h)]:
-                        setattr(variant, h, int(data[headers.index(h)]))
-                # process the floats
-                elif variant_headers[h] == 'float':
-                    field = h
-                    if '%' in h:
-                        field = h.replace('%', 'pct')
-                    if data[headers.index(h)]:
-                        setattr(variant, field, float(data[headers.index(h)]))
-                # process the strings
-                elif variant_headers[h] == 'str':
-                    field = h
-                    if h == 'chr':
-                        field = 'chrom'
-                    setattr(variant, field, data[headers.index(h)])
+                if h in headers:
+                    # process the ints
+                    if variant_headers[h] == 'int':
+                        if data[headers.index(h)]:
+                            setattr(variant, h, int(data[headers.index(h)]))
+                    # process the floats
+                    elif variant_headers[h] == 'float':
+                        field = h
+                        if '%' in h:
+                            field = h.replace('%', 'pct')
+                        data[headers.index(h)] = data[headers.index(h)].replace('%', '')
+                        if data[headers.index(h)]:
+                            setattr(variant, field, float(data[headers.index(h)]))
+                    # process the strings
+                    elif variant_headers[h] == 'str':
+                        field = h
+                        if h == 'chr':
+                            field = 'chrom'
+                        if h == 'gene':
+                            field = 'gene_name'
+                        setattr(variant, field, data[headers.index(h)])
             # process extra fields
             extra_headers_list = []
             for eh in extra_headers:
-                extra_headers_list.append(
-                    '{}={}'.format(eh, data[headers.index[eh]])
-                )
+                if data[headers.index(eh)]:
+                    extra_headers_list.append(
+                        '{}={}'.format(eh, data[headers.index(eh)])
+                    )
             variant.extra_info = ';'.join(extra_headers_list)
-            variant.save()
+            # this is too slow, 1000000% too slow. do in bulk.
+            # variant.save()
+            all_variants.append(variant)
 
-
-def report_file_formatter(filename):
-    shutil.copy(os.path.join(settings.MEDIA_ROOT, filename),
-                os.path.join(settings.MEDIA_ROOT, 'original_files',
-                             filename)
-                )
-    report_file = open(os.path.join(settings.MEDIA_ROOT, filename), 'r')
-    header_line_dict = get_header_cols_and_delim(report_file)
-    temp_report_file = open(os.path.join(
-        settings.MEDIA_ROOT, filename, '.tmp'),
-        'w'
+    # process all at once
+    Variant.objects.bulk_create(all_variants)
+    print "Loaded {} variants from file: {}".format(
+        len(all_variants), report_file.name
     )
+    return True
 
-    # start off in all lowercase
-    cols = [x.lower() for x in header_line_dict['cols']]
-
-    # check for mandatory columns: chr, pos, ref, alt
-    missing_list = []
-    for c in ['chr', 'pos', 'ref', 'alt']:
-        if c not in cols:
-            missing_list.append(c)
-    if len(missing_list) > 0:
-        msg = "ERROR: Mandatory columns [{}] missing from report file " + \
-              "headers\n{}"
-        print msg.format(', '.join(missing_list), cols)
-    else:
-        pass
-        # load into db?

@@ -4,7 +4,6 @@ from django.conf.urls.static import static
 
 import views
 
-
 urlpatterns = patterns('',
                        # Access pages
                        url(r'^$', views.index, name='index'),
@@ -71,3 +70,5 @@ urlpatterns = patterns('',
                            views.ajax_search_reports, name='ajax_search_reports'),
 
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
