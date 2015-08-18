@@ -366,7 +366,6 @@ def get_bnids_by_study(request, study_id=None):
 def load_variants(request, report_id=None):
     print "Load Variants for Report ID: {}".format(report_id)
     report_obj = Report.objects.get(pk=report_id)
-    print report_obj.bnids.first().id
     report_parser.load_into_db(report_obj)
     return HttpResponseRedirect('/viewer/report/')
 

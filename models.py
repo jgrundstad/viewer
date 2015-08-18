@@ -82,17 +82,17 @@ class Variant(models.Model):
     normal_ref_count = models.IntegerField(verbose_name='Normal Ref Count',
                                            blank=True, null=True)
     normal_alt_count = models.IntegerField(verbose_name='Normal Alt Count',
-                                           blank=True, null=True),
+                                           blank=True, null=True)
     pct_normal_alt = models.FloatField(verbose_name='%_Normal_Alt',
-                                       blank = True, null=True),
+                                       blank = True, null=True)
     tumor_ref_count = models.IntegerField(verbose_name='Tumor Ref Count',
                                           blank=True, null=True)
     tumor_alt_count = models.IntegerField(verbose_name='Tumor Alt Count',
                                           blank=True, null=True)
     pct_tumor_alt = models.FloatField(verbose_name='%_Tormal_Alt',
-                                      blank=True, null=True),
+                                      blank=True, null=True)
     tn_pct_alt_ratio = models.FloatField(verbose_name='T/N % alt ratio',
-                                         blank=True, null=True),
+                                         blank=True, null=True)
     gene_name = models.CharField(max_length=32, verbose_name='Gene Name',
                                  blank=True, null=True)
     extra_info = models.CharField(verbose_name='Extra Info', blank=True,
