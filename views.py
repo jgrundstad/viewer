@@ -262,7 +262,6 @@ def manage_report(request):
 def upload_report(request):
     if request.method == 'POST':
         print "POST from upload_report"
-        #print str(request)
         if request.FILES:
             rform = ReportForm(request.POST, request.FILES)
         else:
@@ -271,13 +270,31 @@ def upload_report(request):
             rform.save()
             return HttpResponseRedirect('/viewer/report/')
         else:
-            print "rform is Invalid"
+            print "rform (ReportForm) is Invalid"
             print str(rform)
     else:
         rform = ReportForm(instance=Report(), initial={})
         context = {'report_form': rform}
         context.update(csrf(request))
         return render_to_response('viewer/report/upload_report.html', context,
+                                  context_instance=RequestContext(request))
+
+@user_passes_test(in_proj_user_group)
+def edit_report(request, report_id):
+    if request.method == 'POST':
+        r = Report.objects.get(pk=report_id)
+        updated_form = ReportForm(request.POST, instance=r)
+        if updated_form.is_valid():
+            updated_form.save()
+            return HttpResponseRedirect('/viewer/report')
+    else:
+        report_obj = Report.objects.get(pk=report_id)
+        rform = ReportForm(instance=report_obj)
+        context = {'report_form': rform,
+                   'report': report_obj.report_file,
+                   'pk': report_id,}
+        context.update(csrf(request))
+        return render_to_response('viewer/report/edit_report.html', context,
                                   context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)

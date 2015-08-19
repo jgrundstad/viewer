@@ -29,10 +29,27 @@ jQuery(document).ready(function(){
         closeOnClick: 'overlay',
         closeButton: 'box'
     });
+    var $modalEditButton = $('.igsbviewer-modal-edit-button');
+    $modalEditButton.click(function(){
+        pk = $(this).data('pk');
+    });
+    new jBox('Modal', {
+        onOpen: function(){
+            this.options.ajax.url = '/viewer/report/edit_report/' + pk;
+        },
+        ajax: {
+            reload: true
+        },
+        attach: $modalEditButton,
+        overlay: true,
+        closeOnClick: 'overlay',
+        closeButton: 'box'
+    });
 
     /* Set up 'delete' modal box */
     var pk = 0;
     var $modalDeleteButton = $('.igsbviewer-modal-delete-button');
+
     $modalDeleteButton.click(function(){
         pk = $(this).data('pk');
     });
@@ -144,6 +161,7 @@ jQuery(document).ready(function(){
 					</form>
 				</td>
                 <td>
+                    <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
                     <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.id}}"></span>
                 </td>
 			</tr>

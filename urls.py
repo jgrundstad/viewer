@@ -51,6 +51,8 @@ urlpatterns = patterns('',
                        # Report
                        url(r'^report/$', views.manage_report,
                            name='manage_report'),
+                       url(r'^report/edit_report/(?P<report_id>\d+)/$',
+                           views.edit_report, name='edit_report'),
                        url(r'report/view_report/(?P<file_id>\d+)/$',
                            views.view_report, name='view_report'),
                        url(r'^report/upload_report/$', views.upload_report,
