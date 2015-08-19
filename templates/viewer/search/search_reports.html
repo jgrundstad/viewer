@@ -93,7 +93,7 @@ $(document).ready(function(){
         <div class="col-md-2">
             <select class="form-control" id="search_col_select">
                 {% for variant_field in variant_fields %}
-                <option value="{{ variant_field }}">{{ variant_field }}</option>
+                <option value="{{ variant_field }}"{% if variant_field == "gene_name" %}selected="selected"{% endif %}>{{ variant_field }}</option>
                 {% endfor %}
             </select>
         </div>
