@@ -38,6 +38,7 @@ Web application to load, annotate, parse, search, and display annotated Variant 
 ---
 
 ## Edits to Site (root) settings files:
+Place the ```viewer``` directory into your new or pre-existing site directory, then make the following updates and additions.
 
 ### settings.py
 ```python
