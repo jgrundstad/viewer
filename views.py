@@ -72,6 +72,11 @@ def user_login(request):
         context.update(csrf(request))
         return render(request, 'viewer/login.html', context)
 
+def change_password(request):
+    if request.method == 'POST':
+        pass
+
+    return HttpResponse('change password')
 
 def restricted(request):
     context = {}
