@@ -110,5 +110,15 @@ urlpatterns = patterns('',
                       )
 ```
 
-
+## Create 'project_user' group through the django admin interface
+Apply these permissions:
+* Caller, Genome
+  * Add 
+* Project
+  * Add
+  * Change
+* Study, Sample, Bnid, Report, Variant
+  * Add
+  * Change
+  * Delete
 
