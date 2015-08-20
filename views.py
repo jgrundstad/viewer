@@ -8,7 +8,7 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 import simplejson
 
-from django_ajax.decorators import ajax
+#from django_ajax.decorators import ajax
 
 from forms import BnidForm, SampleForm, ReportForm, StudyForm, UserForm
 from forms import StudySelectorForm
@@ -262,7 +262,6 @@ def manage_report(request):
 def upload_report(request):
     if request.method == 'POST':
         print "POST from upload_report"
-        #print str(request)
         if request.FILES:
             rform = ReportForm(request.POST, request.FILES)
         else:
@@ -271,13 +270,31 @@ def upload_report(request):
             rform.save()
             return HttpResponseRedirect('/viewer/report/')
         else:
-            print "rform is Invalid"
+            print "rform (ReportForm) is Invalid"
             print str(rform)
     else:
         rform = ReportForm(instance=Report(), initial={})
         context = {'report_form': rform}
         context.update(csrf(request))
         return render_to_response('viewer/report/upload_report.html', context,
+                                  context_instance=RequestContext(request))
+
+@user_passes_test(in_proj_user_group)
+def edit_report(request, report_id):
+    if request.method == 'POST':
+        r = Report.objects.get(pk=report_id)
+        updated_form = ReportForm(request.POST, instance=r)
+        if updated_form.is_valid():
+            updated_form.save()
+            return HttpResponseRedirect('/viewer/report')
+    else:
+        report_obj = Report.objects.get(pk=report_id)
+        rform = ReportForm(instance=report_obj)
+        context = {'report_form': rform,
+                   'report': report_obj.report_file,
+                   'pk': report_id,}
+        context.update(csrf(request))
+        return render_to_response('viewer/report/edit_report.html', context,
                                   context_instance=RequestContext(request))
 
 @user_passes_test(in_proj_user_group)
@@ -322,14 +339,15 @@ def search_reports(request):
 
 
 @user_passes_test(in_proj_user_group)
-@ajax
+#@ajax
 def ajax_search_reports(request, search_col, search_term, search_type):
     db_lookup = '%s__%s' % (search_col, search_type)
     variants = Variant.objects.filter(**{db_lookup: search_term})
     #print variants[0].report.study.description
     # from django.core import serializers
     # vars = serializers.serialize('json', variants)
-    return report_parser.json_from_ajax(variants)
+    return HttpResponse(report_parser.json_from_ajax(variants))
+    #return report_parser.json_from_ajax(variants)
 
 
 '''
@@ -365,9 +383,8 @@ def get_bnids_by_study(request, study_id=None):
 def load_variants(request, report_id=None):
     print "Load Variants for Report ID: {}".format(report_id)
     report_obj = Report.objects.get(pk=report_id)
-    print report_obj.bnids.first().id
     report_parser.load_into_db(report_obj)
-    return HttpResponseRedirect('/viewer/upload_report/')
+    return HttpResponseRedirect('/viewer/report/')
 
 
 
