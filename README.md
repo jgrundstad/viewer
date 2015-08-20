@@ -111,7 +111,7 @@ urlpatterns = patterns('',
 ```
 
 ## Create 'project_user' group through the django admin interface
-Apply these permissions:
+Under the ```groups``` section, select ```"Add Group"```, then apply these permissions:
 * Caller, Genome
   * Add 
 * Project
@@ -122,3 +122,6 @@ Apply these permissions:
   * Change
   * Delete
 
+Every user that registers must be added to the project_user group to be able to use the application.
+
+*NOTE:* Don't forget to create your django superuser account first.
