@@ -250,13 +250,8 @@ def report_file_formatter(filename):
     :param filename: string of just the name, no path
     :return checks_out: boolean, True - formatted and works, False - bad
     """
-    checks_out = True
     # make a copy of the original
     media_path = get_media_path()
-    shutil.copy(os.path.join(media_path, filename),
-                os.path.join(media_path, 'original_files',
-                             filename)
-                )
     report_file = open(os.path.join(media_path, filename), 'r')
     header_line_dict = get_header_cols_and_delim(report_file)
     delimiter = header_line_dict['delim']
@@ -272,22 +267,21 @@ def report_file_formatter(filename):
             missing_list.append(c)
 
     if len(missing_list) > 0:
-        msg = "ERROR: Mandatory columns [{}] missing from report file " + \
-              "headers\n{}"
+        msg = ("ERROR: Mandatory columns [{}] missing from report file " +
+               "headers\n{}")
         print msg.format(', '.join(missing_list), cols)
-        checks_out = False
-    else:
-        # print to temp file
-        temp_report_file = open(os.path.join(media_path, filename + '.tmp'),'w')
+        return False
+    # print to temp file
+    temp_report_file = open(os.path.join(media_path, filename + '.tmp'),'w')
 
-        print >>temp_report_file, delimiter.join(cols)
-        for line in report_file:
-            print >>temp_report_file, line.rstrip()
-        shutil.move(os.path.join(media_path, filename + '.tmp'),
-                    os.path.join(media_path, filename)
-                    )
+    print >>temp_report_file, delimiter.join(cols)
+    for line in report_file:
+        print >>temp_report_file, line.rstrip()
+    shutil.move(os.path.join(media_path, filename + '.tmp'),
+                os.path.join(media_path, filename)
+                )
 
-    return checks_out
+    return True
 
 
 def load_into_db(report):
@@ -300,9 +294,10 @@ def load_into_db(report):
         return False
 
     media_path = get_media_path()
+    report_filename = report.report_file.name[2:]
     print "{}/{}".format(media_path, report.report_file.name)
 
-    checks_out = report_file_formatter(report.report_file.name)
+    checks_out = report_file_formatter(report_filename)
     if checks_out:
         print "{} checks out.".format(media_path + report.report_file.name)
 
@@ -361,5 +356,8 @@ def load_into_db(report):
     print "Loaded {} variants from file: {}".format(
         len(all_variants), report_file.name
     )
+
+    # Remove uploaded file from server
+    os.remove(media_path + report.report_file.name)
     return True
 

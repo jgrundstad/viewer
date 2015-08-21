@@ -111,4 +111,3 @@ class StudySelectorForm(forms.Form):
     class Meta:
         fields = ['study']
         widgets = {'study': forms.Select()}
-

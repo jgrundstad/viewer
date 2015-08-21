@@ -98,6 +98,9 @@ jQuery(document).ready(function(){
 <!-- End Modal box content -->
 <div class="container">
 	<h2>Available Variant Reports:</h2>
+    <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
+        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Upload New Variant Report
+    </button>
 	<table id="available" class="table table-hover tablesorter">
 		<thead>
 			<tr>
@@ -108,7 +111,6 @@ jQuery(document).ready(function(){
 				<th></th>
                 <th></th>
 				<th>Upload Date</th>
-				<th>Load Variants?</th>
                 <th>&nbsp;</th>
 			</tr>
 		</thead>
@@ -151,15 +153,6 @@ jQuery(document).ready(function(){
                 </td>
                 {% endif %}
 				<td>{{r.upload_date}}</td>
-				<td>
-					<form action="/viewer/load_variants/{{r.id}}/" method="POST">
-						{% csrf_token %}
-						<input type="hidden" name="Load" id="load-{{r.id}}" value="Load"/>
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <span class="fa fa-database"></span>&nbsp;&nbsp;Load into DB
-                        </button>
-					</form>
-				</td>
                 <td>
                     <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
                     <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.id}}"></span>
@@ -168,8 +161,5 @@ jQuery(document).ready(function(){
 			{% endfor %}
 		</tbody>
 	</table>
-    <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
-        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Upload New Variant Report
-    </button>
 </div>
 {% endblock %}
