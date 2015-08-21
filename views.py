@@ -272,7 +272,8 @@ def upload_report(request):
         else:
             rform = ReportForm(request.POST)
         if rform.is_valid():
-            rform.save()
+            report = rform.save()
+            report_parser.load_into_db(report)
             return HttpResponseRedirect('/viewer/report/')
         else:
             print "rform (ReportForm) is Invalid"
@@ -307,22 +308,19 @@ def view_report(request, file_id):
     # build context from file
     print 'file_id: %s' % file_id
     report_obj = Report.objects.get(pk=file_id)
-    report_data = report_parser.json_from_report(settings.MEDIA_ROOT + \
-                                                 report_obj.report_file.name)
+    variants = report_obj.variant_set.all()
 
     #print report_data
-    report_html = str(report_data.html)
+    report_html = str(report_parser.json_from_ajax(variants))
     # add table class and id
     report_html = report_html.replace("<table>",
         "<table class=\"table table-hover\" id=\"report-table\">")
 
-    #print report_html
     context = {'report_html': report_html,
                'filename': report_obj.report_file.name.split('/')[1],
                'study': report_obj.bnids.first().sample.study,
                'report_obj': report_obj}
-    return render_to_response('viewer/report/view_report.html', context,
-                              context_instance=RequestContext(request))
+    return render(request, 'viewer/report/view_report.html', context)
 
 def delete_report(request, report_id):
     if request.method == 'POST':
@@ -346,7 +344,7 @@ def search_reports(request):
 @user_passes_test(in_proj_user_group)
 #@ajax
 def ajax_search_reports(request, search_col, search_term, search_type):
-    db_lookup = '%s__%s' % (search_col, search_type)
+    db_lookup = '__'.join([search_col, search_type])
     variants = Variant.objects.filter(**{db_lookup: search_term})
     #print variants[0].report.study.description
     # from django.core import serializers
