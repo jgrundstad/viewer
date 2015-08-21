@@ -283,7 +283,10 @@ def upload_report(request):
 def edit_report(request, report_id):
     if request.method == 'POST':
         r = Report.objects.get(pk=report_id)
-        updated_form = ReportForm(request.POST, instance=r)
+        if request.FILES:
+            updated_form = ReportForm(request.POST, request.FILES, instance=r)
+        else:
+            updated_form = ReportForm(request.POST, instance=r)
         if updated_form.is_valid():
             updated_form.save()
             return HttpResponseRedirect('/viewer/report')
