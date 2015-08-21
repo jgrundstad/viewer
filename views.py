@@ -429,12 +429,22 @@ def get_bnids_by_study(request, study_id=None):
     return HttpResponse(simplejson.dumps(bnid_dict),
                         content_type="application/json")
 
+
 @user_passes_test(in_proj_user_group)
 def load_variants(request, report_id=None):
     print "Load Variants for Report ID: {}".format(report_id)
     report_obj = Report.objects.get(pk=report_id)
     report_parser.load_into_db(report_obj)
     return HttpResponseRedirect('/viewer/report/')
+
+
+@user_passes_test(in_proj_user_group)
+def get_all_projects(request):
+    project_dict = {}
+    for p in Project.objects.all():
+        project_dict[p.pk] = p.name
+    return HttpResponse(simplejson.dump(project_dict),
+                        content_type="application/json")
 
 
 

@@ -96,7 +96,7 @@ class StudyForm(forms.ModelForm):
 
     class Meta:
         model = Study
-        fields = ['name', 'description']
+        fields = ['project', 'name', 'description']
         widgets = {'description': forms.Textarea(attrs={'cols': 30,
                                                         'rows': 6,
                                                         'style': 'resize:none'}),}
