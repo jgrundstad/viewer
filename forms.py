@@ -54,11 +54,12 @@ class ReportForm(forms.ModelForm):
     report_file = forms.FileField(widget=AdminFileWidget, required=False)
 
     def __init__(self, *args, **kwargs):
-       super(ReportForm, self).__init__(*args, **kwargs)
-       for field in self.fields:
-           self.fields[field].widget.attrs.update({
-               'class': 'form-control'
-           })
+        super(ReportForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+        self.fields['report_file'].label = 'Report file (must be .csv or .tsv):'
        # self.fields['bnids'] = forms.SelectMultiple()
 
     class Meta:
@@ -73,11 +74,11 @@ class ReportForm(forms.ModelForm):
 
 class StudyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-       super(StudyForm, self).__init__(*args, **kwargs)
-       for field in self.fields:
-           self.fields[field].widget.attrs.update({
-               'class': 'form-control'
-           })
+        super(StudyForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
 
     class Meta:
         model = Study
