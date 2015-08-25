@@ -365,7 +365,7 @@ def view_report(request, file_id):
     # load from file version
     report_data = report_parser.json_from_report(
         os.path.join(report_parser.get_media_path(),
-                     report_obj.reprt_file.name))
+                     report_obj.report_file.name))
     report_html = str(report_data.html)
 
     # add table class and id
