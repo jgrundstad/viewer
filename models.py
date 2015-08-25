@@ -99,12 +99,12 @@ class Variant(models.Model):
     normal_alt_count = models.IntegerField(verbose_name='Normal Alt Count',
                                            blank=True, null=True)
     pct_normal_alt = models.FloatField(verbose_name='%_Normal_Alt',
-                                       blank = True, null=True)
+                                       blank=True, null=True)
     tumor_ref_count = models.IntegerField(verbose_name='Tumor Ref Count',
                                           blank=True, null=True)
     tumor_alt_count = models.IntegerField(verbose_name='Tumor Alt Count',
                                           blank=True, null=True)
-    pct_tumor_alt = models.FloatField(verbose_name='%_Tormal_Alt',
+    pct_tumor_alt = models.FloatField(verbose_name='%_Tumor_Alt',
                                       blank=True, null=True)
     tn_pct_alt_ratio = models.FloatField(verbose_name='T/N % alt ratio',
                                          blank=True, null=True)
