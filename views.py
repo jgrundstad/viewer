@@ -355,10 +355,17 @@ def view_report(request, file_id):
     # build context from file
     print 'file_id: %s' % file_id
     report_obj = Report.objects.get(pk=file_id)
-    variants = report_obj.variant_set.all()
 
-    #print report_data
-    report_html = str(report_parser.json_from_ajax(variants))
+    # Ajaxy version to grab variants from db
+    #variants = report_obj.variant_set.all()
+    # print report_data
+    #report_html = str(report_parser.json_from_ajax(variants))
+
+    # load from file version
+    report_data = report_parser.json_from_report(settings.MEDIA_ROOT + \
+                                                 report_obj.reprt_file.name)
+    report_html = str(report_data.html)
+
     # add table class and id
     report_html = report_html.replace("<table>",
         "<table class=\"table table-hover\" id=\"report-table\">")
