@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
+import os
 import simplejson
 
 #from django_ajax.decorators import ajax
@@ -355,10 +356,18 @@ def view_report(request, file_id):
     # build context from file
     print 'file_id: %s' % file_id
     report_obj = Report.objects.get(pk=file_id)
-    variants = report_obj.variant_set.all()
 
-    #print report_data
-    report_html = str(report_parser.json_from_ajax(variants))
+    # Ajaxy version to grab variants from db
+    #variants = report_obj.variant_set.all()
+    # print report_data
+    #report_html = str(report_parser.json_from_ajax(variants))
+
+    # load from file version
+    report_data = report_parser.json_from_report(
+        os.path.join(report_parser.get_media_path(),
+                     report_obj.report_file.name))
+    report_html = str(report_data.html)
+
     # add table class and id
     report_html = report_html.replace("<table>",
         "<table class=\"table table-hover\" id=\"report-table\">")
@@ -429,12 +438,22 @@ def get_bnids_by_study(request, study_id=None):
     return HttpResponse(simplejson.dumps(bnid_dict),
                         content_type="application/json")
 
+
 @user_passes_test(in_proj_user_group)
 def load_variants(request, report_id=None):
     print "Load Variants for Report ID: {}".format(report_id)
     report_obj = Report.objects.get(pk=report_id)
     report_parser.load_into_db(report_obj)
     return HttpResponseRedirect('/viewer/report/')
+
+
+@user_passes_test(in_proj_user_group)
+def get_all_projects(request):
+    project_dict = {}
+    for p in Project.objects.all():
+        project_dict[p.pk] = p.name
+    return HttpResponse(simplejson.dump(project_dict),
+                        content_type="application/json")
 
 
 

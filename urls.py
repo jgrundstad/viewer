@@ -31,6 +31,8 @@ urlpatterns = patterns('',
                            views.new_project, name='new_project'),
                        url(r'^project/edit_project/(?P<project_id>\d+)/$',
                            views.edit_project, name='edit_project'),
+                       url(r'^get_all_projects/$', views.get_all_projects,
+                           name='get_all_projects'),
 
 
                        # Bnid
