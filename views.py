@@ -393,7 +393,8 @@ Search functions
 @user_passes_test(in_proj_user_group)
 def search_reports(request):
     variant_fields = Variant._meta.get_all_field_names()
-    context = {'variant_fields':variant_fields}
+    num_reports = len(list(set(Variant.objects.values_list('report', flat=True))))
+    context = {'variant_fields':variant_fields, 'num_reports': num_reports}
     return render(request, 'viewer/search/search_reports.html', context)
 
 
