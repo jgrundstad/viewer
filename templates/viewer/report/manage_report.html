@@ -110,8 +110,10 @@ jQuery(document).ready(function(){
 				<th>Caller</th>
 				<th></th>
                 <th></th>
+                <th></th>
 				<th>Upload Date</th>
                 <th>&nbsp;</th>
+                <th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -138,6 +140,7 @@ jQuery(document).ready(function(){
                 <td>
                     <a href="/viewer/files/{{r.report_file.name}}">Download</a>
                 </td>
+                    <td>{{r.report_file.name}}</td>
                 {% else %}
                 <td></td>
                 <td>
@@ -156,7 +159,9 @@ jQuery(document).ready(function(){
                 <td>
                     <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
                     <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.id}}"></span>
+
                 </td>
+            <td>{{ r.variant_set.all | length }} Variants loaded</td>
 			</tr>
 			{% endfor %}
 		</tbody>
