@@ -58,6 +58,7 @@ INSTALLED_APPS = (
 )
 
 # EMAIL and SMTP settings
+# Only needed for production
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.someservice.com'
 EMAIL_PORT = 587
@@ -67,6 +68,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# this can be done in debug mode with a simple sqlite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -76,7 +78,7 @@ DATABASES = {
     }
 }
 
-# Cronjobs
+# Cronjobs, only needed in production
 CRONJOBS = [
         ('10 2 * * *',
             'viewer.links_out.cron.gather_md_anderson')
