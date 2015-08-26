@@ -369,8 +369,8 @@ def view_report(request, file_id):
     report_html = str(report_data.html)
 
     # add table class and id
-    report_html = report_html.replace("<table>",
-        "<table class=\"table table-hover\" id=\"report-table\">")
+    replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
+    report_html = report_html.replace("<table>", replace_string)
 
     context = {'report_html': report_html,
                'filename': report_obj.report_file.name.split('/')[1],
