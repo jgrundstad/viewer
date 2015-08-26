@@ -333,6 +333,8 @@ def load_into_db(report):
                         field = h
                         if '%' in h:
                             field = h.replace('%', 'pct')
+                        if '/' in h:
+                            field = h.replace('/', '')
                         data[headers.index(h)] = data[headers.index(h)].replace('%', '')
                         if data[headers.index(h)]:
                             setattr(variant, field, float(data[headers.index(h)]))
