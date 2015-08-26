@@ -336,10 +336,12 @@ def edit_report(request, report_id):
         r = Report.objects.get(pk=report_id)
         if request.FILES:
             updated_form = ReportForm(request.POST, request.FILES, instance=r)
+            r.variant_set.all().delete()
         else:
             updated_form = ReportForm(request.POST, instance=r)
         if updated_form.is_valid():
             updated_form.save()
+            report_parser.load_into_db(r)
             return HttpResponseRedirect('/viewer/report')
     else:
         report_obj = Report.objects.get(pk=report_id)
@@ -358,15 +360,15 @@ def view_report(request, file_id):
     report_obj = Report.objects.get(pk=file_id)
 
     # Ajaxy version to grab variants from db
-    #variants = report_obj.variant_set.all()
+    variants = report_obj.variant_set.all()
     # print report_data
-    #report_html = str(report_parser.json_from_ajax(variants))
+    report_html = str(report_parser.json_from_ajax(variants))
 
     # load from file version
-    report_data = report_parser.json_from_report(
-        os.path.join(report_parser.get_media_path(),
-                     report_obj.report_file.name))
-    report_html = str(report_data.html)
+    # report_data = report_parser.json_from_report(
+    #     os.path.join(report_parser.get_media_path(),
+    #                  report_obj.report_file.name))
+    # report_html = str(report_data.html)
 
     # add table class and id
     report_html = report_html.replace("<table>",
