@@ -358,6 +358,6 @@ def load_into_db(report):
     )
 
     # Remove uploaded file from server
-    os.remove(media_path + report.report_file.name)
+    #os.remove(media_path + report.report_file.name)
     return True
 
