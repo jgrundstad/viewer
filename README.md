@@ -91,6 +91,7 @@ LOGIN_URL = '/viewer/login/'
 ```
 
 ### my.cnf (as referenced in the ```# Database``` section above)
+Create the mysql database with the same parameters used in the ```my.cnf``` file:
 ```python
 [client]
 database = report_viewer
@@ -98,6 +99,10 @@ user = dbusername
 password = dbpassword
 host = dbhost
 default-character-set = utf8
+```
+When the database server is running, and the database has been created, be sure to create the django superuser:
+```python
+python manage.py createsuperuser
 ```
 
 
@@ -124,4 +129,3 @@ Under the ```groups``` section, select ```"Add Group"```, then apply these permi
 
 Every user that registers must be added to the project_user group to be able to use the application.
 
-*NOTE:* Don't forget to create your django superuser account first.
