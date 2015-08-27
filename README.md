@@ -21,6 +21,7 @@ Web application to load, annotate, parse, search, and display annotated Variant 
 * django-crontab==0.6.0
 * django-extensions==1.5.2
 * django-password-reset==0.7
+* django-uuidfield==0.5.0
 * ipython==3.1.0
 * mysqlclient==1.3.5
 * pydot==1.0.2
