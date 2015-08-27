@@ -43,7 +43,7 @@ class VariantAdmin(admin.ModelAdmin):
 
 class RecipientAdmin(admin.ModelAdmin):
     model = Recipient
-    list_display = ('email', 'project')
+    list_display = ('full_name', 'email', 'project')
 
 class SharedReportAdmin(admin.ModelAdmin):
     model = SharedReport
