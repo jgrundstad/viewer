@@ -1,6 +1,6 @@
 from django.contrib import admin
 from models import Project, Bnid, Sample, Study, Caller, Report, Variant, \
-    Genome
+    Genome, SharedReport, Recipient
 
 class ProjectAdmin(admin.ModelAdmin):
     model = Project
@@ -42,6 +42,9 @@ class VariantAdmin(admin.ModelAdmin):
                     'tumor_alt_count')
 
 
+class SharedReportAdmin(admin.ModelAdmin):
+    model = SharedReport
+
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Sample, SampleAdmin)
 admin.site.register(Bnid, BnidAdmin)
@@ -50,3 +53,5 @@ admin.site.register(Caller, CallerAdmin)
 admin.site.register(Report, ReportAdmin)
 admin.site.register(Genome, GenomeAdmin)
 admin.site.register(Variant, VariantAdmin)
+admin.site.register(SharedReport, SharedReportAdmin)
+admin.site.register(Recipient)

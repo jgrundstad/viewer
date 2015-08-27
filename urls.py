@@ -82,6 +82,9 @@ urlpatterns = patterns('',
                        url(r'^load_variants/(?P<report_id>\d+)/$', views.load_variants,
                            name='load_variants'),
 
+                       url(r'^shared/view/(?P<shared_report_uuid>[\da-f\-]+)/$', views.view_shared_report,
+                           name='view_shared_report'),
+
                        url(r'^files/(?P<path>.*)$',
                            'django.views.static.serve',
                            {'document_root': settings.MEDIA_ROOT}),

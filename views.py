@@ -8,13 +8,14 @@ from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 import os
 import simplejson
+from datetime import date
 
 #from django_ajax.decorators import ajax
 
 from forms import ProjectForm, BnidForm, SampleForm, ReportForm, \
     StudyForm, UserForm
 from forms import StudySelectorForm
-from models import Project, Bnid, Sample, Report, Study, Variant
+from models import Project, Bnid, Sample, Report, Study, Variant, SharedReport
 from access_tests import in_proj_user_group
 
 from util import report_parser
@@ -410,6 +411,29 @@ def ajax_search_reports(request, search_col, search_term, search_type):
     # vars = serializers.serialize('json', variants)
     return HttpResponse(report_parser.json_from_ajax(variants))
     #return report_parser.json_from_ajax(variants)
+
+'''
+Shared Reports
+'''
+def view_shared_report(request, shared_report_uuid):
+    shared_report = SharedReport.objects.filter(uuid__iexact=shared_report_uuid)
+    if len(shared_report) == 0:
+        return HttpResponse('This report does not exist')
+    shared_report = shared_report[0]
+    if shared_report.inactive_date < date.today():
+        return HttpResponse('This report is expired')# This report has expired
+
+    variants = shared_report.report.variant_set.all()
+    report_html = str(report_parser.json_from_ajax(variants))
+
+    replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
+    report_html = report_html.replace("<table>", replace_string)
+
+    context = {'report_html': report_html,
+               'filename': shared_report.report.report_file.name.split('/')[1],
+               'study': shared_report.report.bnids.first().sample.study,
+               'report_obj': shared_report.report}
+    return render(request, 'viewer/report/view_report.html', context)
 
 
 '''
