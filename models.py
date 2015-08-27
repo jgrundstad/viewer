@@ -124,9 +124,13 @@ class Recipient(models.Model):
     project = models.ForeignKey(Project, verbose_name='Project',
                                 blank=True, null=True)
 
+    def __unicode__(self):
+        return self.email
+
 
 class SharedReport(models.Model):
-    uuid = UUIDField(hyphenate=True, blank=True, null=True) # defaults to v.4
+    uuid = UUIDField(auto=True, hyphenate=True, blank=True,
+                     null=True) # defaults to v.4
     report = models.ForeignKey(Report)
     creation_date = models.DateField(verbose_name='Creation Date',
                                      default=datetime.date.today)
@@ -134,3 +138,7 @@ class SharedReport(models.Model):
     shared_recipient = models.ManyToManyField(Recipient,
                                               verbose_name='Shared Recipient')
     user = models.ForeignKey(User, verbose_name="Project User")
+
+    def __unicode__(self):
+        return str(self.uuid)
+
