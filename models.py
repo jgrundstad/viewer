@@ -120,12 +120,13 @@ class Variant(models.Model):
 
 
 class Recipient(models.Model):
+    full_name = models.CharField(max_length=256, verbose_name='Full Name')
     email = models.EmailField(verbose_name='Email')
     project = models.ForeignKey(Project, verbose_name='Project',
                                 blank=True, null=True)
 
     def __unicode__(self):
-        return self.email
+        return '"{}" <{}>'.format(self.full_name, self.email)
 
 
 class SharedReport(models.Model):
