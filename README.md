@@ -21,6 +21,7 @@ Web application to load, annotate, parse, search, and display annotated Variant 
 * django-crontab==0.6.0
 * django-extensions==1.5.2
 * django-password-reset==0.7
+* django-uuidfield==0.5.0
 * ipython==3.1.0
 * mysqlclient==1.3.5
 * pydot==1.0.2
@@ -58,6 +59,7 @@ INSTALLED_APPS = (
 )
 
 # EMAIL and SMTP settings
+# Only needed for production
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.someservice.com'
 EMAIL_PORT = 587
@@ -67,6 +69,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# this can be done in debug mode with a simple sqlite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -76,7 +79,7 @@ DATABASES = {
     }
 }
 
-# Cronjobs
+# Cronjobs, only needed in production
 CRONJOBS = [
         ('10 2 * * *',
             'viewer.links_out.cron.gather_md_anderson')

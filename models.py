@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from uuidfield import UUIDField
+import datetime
 
 
 class Project(models.Model):
@@ -116,3 +118,19 @@ class Variant(models.Model):
     def __str__(self):
         return "{}:{}{}>{}".format(self.chrom, self.pos, self.ref, self.alt)
 
+
+class Recipient(models.Model):
+    email = models.EmailField(verbose_name='Email')
+    project = models.ForeignKey(Project, verbose_name='Project',
+                                blank=True, null=True)
+
+
+class SharedReport(models.Model):
+    uuid = UUIDField(hyphenate=True, blank=True, null=True) # defaults to v.4
+    report = models.ForeignKey(Report)
+    creation_date = models.DateField(verbose_name='Creation Date',
+                                     default=datetime.date.today)
+    inactive_date = models.DateField(verbose_name='Inactive Date')
+    shared_recipient = models.ManyToManyField(Recipient,
+                                              verbose_name='Shared Recipient')
+    user = models.ForeignKey(User, verbose_name="Project User")

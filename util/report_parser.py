@@ -18,8 +18,13 @@ variant_headers = {'chr': 'str',
                    'tumor_ref_count': 'int',
                    'tumor_alt_count': 'int',
                    'pct_tumor_alt': 'float',
-                   't/n_pct_alt_ratio': 'float',
+                   'tn_pct_alt_ratio': 'float',
                    'gene': 'str'}
+
+ordered_headers = ['chr', 'pos', 'ref', 'alt', 'normal_ref_count',
+                   'normal_alt_count', 'pct_normal_alt', 'tumor_ref_count',
+                   'tumor_alt_count', 'pct_tumor_alt', 'tn_pct_alt_ratio',
+                   'gene']
 
 
 def get_media_path():
@@ -80,7 +85,7 @@ def classify_headers(header_list):
             canonical.append(h)
         else:
             extra.append(h)
-    return (canonical, extra)
+    return canonical, extra
 
 
 def add_goodies(atoms, headers, md_anderson_genes, eMERGE_genelist):
@@ -328,6 +333,8 @@ def load_into_db(report):
                         field = h
                         if '%' in h:
                             field = h.replace('%', 'pct')
+                        if '/' in h:
+                            field = h.replace('/', '')
                         data[headers.index(h)] = data[headers.index(h)].replace('%', '')
                         if data[headers.index(h)]:
                             setattr(variant, field, float(data[headers.index(h)]))
@@ -361,3 +368,44 @@ def load_into_db(report):
     #os.remove(media_path + report.report_file.name)
     return True
 
+
+def export_variants_to_file(report):
+    filename = report.report_file.name
+    variants = Variant.objects.filter(report=report)
+    print "Identifed {} variants for report: {} - id: {}".format(
+        len(variants), filename, report.pk
+    )
+    # find all possible headers
+    headers = ordered_headers
+    all_headers = ordered_headers
+    for v in variants:
+        for pair in v.extra_info.split(';'):
+            key, val = pair.split('=')
+            if key not in all_headers:
+                all_headers.append(key)
+
+    file_string = ''
+    count = 0
+    for v in variants:
+        v_tokens = [''] * len(all_headers) # fill now, join/print later
+        for h in headers: # canonical
+            field = h
+            if h == 'chr':
+                field = 'chrom' # correct this for database
+            if h == 'gene':
+                field = 'gene_name'
+            if h == 't/n_pct_alt_ratio':
+                field = 'tn_pct_alt_ratio'
+            v_tokens[all_headers.index(h)] = getattr(v, field, '')
+        for pair in v.extra_info.split(';'): # varies variant to variant
+            ex_header = pair.split('=')[0]
+            v_tokens[all_headers.index(ex_header)] = pair.split('=')[1]
+        #print "v_tokens: {}".format(v_tokens)
+        v_tokens_str = [str(x) for x in v_tokens]
+        file_string += "{}\n".format('\t'.join(v_tokens_str))
+        count += 1
+
+    export_file = open(os.path.join(get_media_path(), 'original_files', filename), 'w')
+    print >>export_file, '\t'.join(all_headers)
+    print >>export_file, file_string
+    print "Exported {} variants to {}".format(count, filename)
