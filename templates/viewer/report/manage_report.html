@@ -64,7 +64,18 @@ jQuery(document).ready(function(){
         overlay: true,
         closeOnClick: 'overlay',
         closeButton: 'box'
-    })
+    });
+
+    $(".igsbviewer-view-report").click(function(){
+        var pk = $(this).data('pk');
+        var $csrf = $($(this).data('csrf'));
+        console.log('clicked ' + pk);
+        $("<form>").attr({
+            action: '/viewer/report/view_report/' + pk + '/',
+            method: 'POST'
+        }).append($csrf).appendTo($("body")).submit();
+    });
+
 });
 </script>
 {% endblock %}
@@ -106,13 +117,11 @@ jQuery(document).ready(function(){
 			<tr>
 				<th>Study</th>
 				<th>Sample(s)</th>
-				<th>Genome</th>
-				<th>Caller</th>
+				<th></th>
+				<th>Variants</th>
 				<th></th>
                 <th></th>
-                <th></th>
-				<th>Upload Date</th>
-                <th>&nbsp;</th>
+				<th></th>
                 <th></th>
 			</tr>
 		</thead>
@@ -125,43 +134,30 @@ jQuery(document).ready(function(){
 						{{b.sample}} ({{b.bnid}})<br>
 					{% endfor %}
 				</td>
-				<td>{{r.genome}}</td>
-				<td>{{r.caller}}</td>
+				<td>{{r.genome}}<br>{{r.caller}}</td>
+                <td align="center">
+                    <h6><span class="badge">{{ r.variant_set.all | length }}</span></h6>
+                </td>
                 {% if r.report_file.name %}
-				<!--<td><a href=/viewer/report/view_report/{{r.pk}}/>{{r.report_file.name}}</a></td>-->
                 <td>
-                    <form action="/viewer/report/view_report/{{r.pk}}/" method="POST">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <span class="fa fa-desktop"></span>&nbsp;&nbsp;View
-                        </button>
-                    </form>
+                    <span class="fa fa-2x fa-desktop igsbviewer-view-report" data-pk="{{r.pk}}" data-csrf="{% csrf_token %}"></span>
                 </td>
                 <td>
-                    <a href="/viewer/files/{{r.report_file.name}}">Download</a>
+                    <a href="/viewer/files/{{r.report_file.name}}">{{r.report_file.name}}</a>
                 </td>
-                    <td>{{r.report_file.name}}</td>
                 {% else %}
                 <td></td>
-                <td>
-                    <!--
-                    Handle this in separate 'edit' column
-                    <form action="/viewer/edit_report/{{r.id}}/" method="POST">
-                        <input type="hidden" name="Edit" id="{{r.id}}" value="Edit"/>
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <span class="fa fa-upload"></span>&nbsp;&nbsp;Upload File
-                        </button>
-                    </form>
-                    -->
-                </td>
+                <td></td>
                 {% endif %}
 				<td>{{r.upload_date}}</td>
                 <td>
-                    <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
-                    <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.id}}"></span>
 
                 </td>
-            <td>{{ r.variant_set.all | length }} Variants loaded</td>
+                <td>
+                    <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
+                    <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.pk}}"></span>
+                </td>
+
 			</tr>
 			{% endfor %}
 		</tbody>
