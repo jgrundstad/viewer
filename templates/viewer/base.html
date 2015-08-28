@@ -37,26 +37,17 @@
         <!-- Custom js and css -->
         <link href="{% static 'css/viewer.css' %}" rel="stylesheet" media="screen">
 
-        {% block extra_js %}
-        {% endblock %}
         <script type="text/javascript">
             jQuery(document).ready(function(){
                 $("#content_wrapper").fadeIn(300);
-                //$('#report-table').floatThead();
-                $('#report-table').DataTable({
-                    scrollY: 400,
-                    scrollX: true,
-                    autowidth: false,
-                    scrollCollapse: true,
-                    paging: false,
-                    "dom": 'RC<"clear">lfrtip'
-                });
-
                 $('#msidebar').MaterialSidebar({
                 });
-
             });
         </script>
+        {% block extra_js %}
+        {% endblock %}
+
+
     </head>
     <body style="padding-top: 70px">
     {% block material-sidebar %}
