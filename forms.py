@@ -45,11 +45,13 @@ class BnidForm(forms.ModelForm):
 
 class SampleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-       super(SampleForm, self).__init__(*args, **kwargs)
-       for field in self.fields:
-           self.fields[field].widget.attrs.update({
-               'class': 'form-control'
-           })
+        super(SampleForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+        # self.fields['study'].queryset = Project.objects.get(pk=kwargs['project_pk']).study_set.all()
+
 
     class Meta:
         model = Sample
@@ -100,7 +102,9 @@ class StudyForm(forms.ModelForm):
         fields = ['project', 'name', 'description']
         widgets = {'description': forms.Textarea(attrs={'cols': 30,
                                                         'rows': 6,
-                                                        'style': 'resize:none'}),}
+                                                        'style': 'resize:none'}),
+                   'project': forms.HiddenInput()
+                  }
 
 class StudySelectorForm(forms.Form):
 

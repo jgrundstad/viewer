@@ -55,6 +55,12 @@
                 $('#msidebar').MaterialSidebar({
                 });
 
+                $(window).keypress(function(e){
+                    if(e.which == 33){
+                        $('#msidebar').MaterialSidebar('open');
+                    }
+                });
+
             });
         </script>
     </head>
@@ -88,6 +94,7 @@
                             <li><a href="/viewer/bnid/">Bionimbus IDs</a></li>
                             <li><a href="/viewer/report/">Reports</a></li>
                             <li><a href="/viewer/search/">Search</a></li>
+                            <li><a href="/viewer/clear/">Clear</a></li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             {% if user.is_authenticated %}

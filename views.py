@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
+from django import forms
 import os
 import simplejson
 from datetime import date
@@ -15,7 +16,7 @@ from datetime import date
 from forms import ProjectForm, BnidForm, SampleForm, ReportForm, \
     StudyForm, UserForm
 from forms import StudySelectorForm
-from models import Project, Bnid, Sample, Report, Study, Variant, SharedReport
+from models import Project, Bnid, Sample, Report, Study, Variant, SharedData
 from access_tests import in_proj_user_group
 
 from util import report_parser
@@ -143,8 +144,15 @@ def edit_project(request, project_id):
 Study model
 '''
 @user_passes_test(in_proj_user_group)
-def manage_study(request):
-    context = {'studies': Study.objects.all()}
+def manage_study(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project')
+    project = Project.objects.get(pk=project_pk)
+    context = {
+        'studies': project.study_set.all(),
+        'project_name': project.name
+    }
     context.update(csrf(request))
     return render_to_response('viewer/study/manage_study.html', context,
                               context_instance=RequestContext(request))
@@ -157,8 +165,14 @@ def new_study(request):
             sform.save()
         return HttpResponseRedirect('/viewer/study/')
     else:
-        sform = StudyForm(instance=Study())
-        context = {'study_form': sform}
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project/')
+        sform = StudyForm(instance=Study(), initial={'project': project_pk})
+        context = {
+            'study_form': sform,
+            'project_name': Project.objects.get(pk=project_pk).name
+        }
         context.update(csrf(request))
         return render_to_response('viewer/study/new_study.html', context,
                                   context_instance=RequestContext(request))
@@ -195,8 +209,15 @@ def delete_study(request, study_id):
 Sample model
 '''
 @user_passes_test(in_proj_user_group)
-def manage_sample(request):
-    context = {'samples': Sample.objects.all()}
+def manage_sample(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project')
+    project = Project.objects.get(pk=project_pk)
+    context = {
+        'samples': Sample.objects.filter(study__project__pk=project_pk),
+        'project_name': project.name
+    }
     context.update(csrf(request))
     return render(request, 'viewer/sample/manage_sample.html', context)
 
@@ -208,8 +229,16 @@ def new_sample(request):
             sform.save()
         return HttpResponseRedirect('/viewer/sample/')
     else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        project = Project.objects.get(pk=project_pk)
         sform = SampleForm(instance=Sample())
-        context = {'sample_form': sform}
+        sform.fields['study'].queryset = project.study_set.all()
+        context = {
+            'sample_form': sform,
+            'project_name': project.name
+        }
         context.update(csrf(request))
         return render_to_response('viewer/sample/new_sample.html', context,
                                   context_instance=RequestContext(request))
@@ -223,9 +252,19 @@ def edit_sample(request, sample_id):
             updated_form.save()
             return HttpResponseRedirect('/viewer/sample/')
     else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        project = Project.objects.get(pk=project_pk)
         sample_obj = Sample.objects.get(pk=sample_id)
         sform = SampleForm(instance=sample_obj)
-        context = {'sample_form': sform, 'name': sample_obj.name, 'pk': sample_obj.pk}
+        sform.fields['study'].queryset = project.study_set.all()
+        context = {
+            'sample_form': sform,
+            'name': sample_obj.name,
+            'pk': sample_obj.pk,
+            'project_name': project.name
+        }
         context.update(csrf(request))
         return render_to_response('viewer/sample/edit_sample.html', context,
                                   context_instance=RequestContext(request))
@@ -245,8 +284,14 @@ def delete_sample(request, sample_id):
 Bionimbus ID model
 '''
 @user_passes_test(in_proj_user_group)
-def manage_bnid(request):
-    context = {'bnids': Bnid.objects.all()}
+def manage_bnid(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project')
+    context = {
+        'bnids': Bnid.objects.filter(sample__study__project__pk=project_pk),
+        'project_name': Project.objects.get(pk=project_pk).name
+    }
     context.update(csrf(request))
     return render(request, 'viewer/bnid/manage_bnid.html', context)
 
@@ -256,15 +301,21 @@ def new_bnid(request): #study_id=None, **kwargs):
         #print "Got study_id: {}".format(study_id)
     if request.method == 'POST':
         bform = BnidForm(request.POST, instance=Bnid())
-        print bform['sample']
-        print bform['bnid']
+        # print bform['sample']
+        # print bform['bnid']
         if bform.is_valid():
             bform.save()
         return HttpResponseRedirect('/viewer/bnid/')
     else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        project = Project.objects.get(pk=project_pk)
         bform = BnidForm(instance=Bnid())
+        bform.fields['sample'].queryset = Sample.objects.filter(study__project__pk=project_pk)
+        # Why does this study selector form exist? TODO
         ss_form = StudySelectorForm()
-        context = {'bnid_form': bform, 'study_selector_form': ss_form}
+        context = {'bnid_form': bform, 'study_selector_form': ss_form, 'project_name': project.name}
         context.update(csrf(request))
         return render_to_response('viewer/bnid/new_bnid.html', context,
                                   context_instance=RequestContext(request))
@@ -278,13 +329,20 @@ def edit_bnid(request, bnid_id):
             updated_form.save()
             return HttpResponseRedirect('/viewer/bnid/')
     else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        project = Project.objects.get(pk=project_pk)
         bnid_obj = Bnid.objects.get(pk=bnid_id)
         bform = BnidForm(instance=bnid_obj)
+        bform.fields['sample'].queryset = Sample.objects.filter(study__project__pk=project_pk)
         ss_form = StudySelectorForm()
         context = {'bnid_form': bform,
                    'bnid': bnid_obj.bnid,
                    'pk': bnid_obj.pk,
-                   'study_selector_form': ss_form}
+                   'study_selector_form': ss_form,
+                   'project_name': project.name
+                   }
         context.update(csrf(request))
         return render_to_response('viewer/bnid/edit_bnid.html', context,
                                   context_instance=RequestContext(request))
@@ -304,8 +362,14 @@ def delete_bnid(request, bnid_id):
 Report model
 '''
 @user_passes_test(in_proj_user_group)
-def manage_report(request):
-    context = {'reports': Report.objects.all()}
+def manage_report(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project/')
+    context = {
+        'reports': Report.objects.filter(study__project__pk=project_pk),
+        'project_name': Project.objects.get(pk=project_pk).name
+    }
     context.update(csrf(request))
     return render(request, 'viewer/report/manage_report.html', context)
 
@@ -325,7 +389,12 @@ def upload_report(request):
             print "rform (ReportForm) is Invalid"
             print str(rform)
     else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        project = Project.objects.get(pk=project_pk)
         rform = ReportForm(instance=Report(), initial={})
+        rform.fields['study'].queryset = project.study_set.all()
         context = {'report_form': rform}
         context.update(csrf(request))
         return render_to_response('viewer/report/upload_report.html', context,
@@ -345,8 +414,13 @@ def edit_report(request, report_id):
             report_parser.load_into_db(r)
             return HttpResponseRedirect('/viewer/report')
     else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        project = Project.objects.get(pk=project_pk)
         report_obj = Report.objects.get(pk=report_id)
         rform = ReportForm(instance=report_obj)
+        rform.fields['study'].queryset = project.study_set.all()
         context = {'report_form': rform,
                    'report': report_obj.report_file,
                    'pk': report_id,}
@@ -405,6 +479,7 @@ def search_reports(request):
 #@ajax
 def ajax_search_reports(request, search_col, search_term, search_type):
     db_lookup = '__'.join([search_col, search_type])
+    print db_lookup
     variants = Variant.objects.filter(**{db_lookup: search_term})
     #print variants[0].report.study.description
     # from django.core import serializers
@@ -416,24 +491,34 @@ def ajax_search_reports(request, search_col, search_term, search_type):
 Shared Reports
 '''
 def view_shared_report(request, shared_report_uuid):
-    shared_report = SharedReport.objects.filter(uuid__iexact=shared_report_uuid)
+    shared_report = SharedData.objects.filter(uuid__iexact=shared_report_uuid)
     if len(shared_report) == 0:
         return HttpResponse('This report does not exist')
     shared_report = shared_report[0]
     if shared_report.inactive_date < date.today():
         return HttpResponse('This report is expired')# This report has expired
 
-    variants = shared_report.report.variant_set.all()
+    field_lookup = simplejson.loads(shared_report.field_lookup)
+    print field_lookup
+    variants = Variant.objects.filter(**field_lookup)
+    print variants
     report_html = str(report_parser.json_from_ajax(variants))
+    rep = Report.objects.get(pk=7)
 
     replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
     report_html = report_html.replace("<table>", replace_string)
 
     context = {'report_html': report_html,
-               'filename': shared_report.report.report_file.name.split('/')[1],
-               'study': shared_report.report.bnids.first().sample.study,
-               'report_obj': shared_report.report}
+               'filename': rep.report_file.name.split('/')[1],
+               'study': rep.bnids.first().sample.study,
+               'report_obj': rep}
     return render(request, 'viewer/report/view_report.html', context)
+
+'''
+Errors
+'''
+def no_project(request):
+    return render(request, 'viewer/error/no_project.html')
 
 
 '''
@@ -483,4 +568,46 @@ def get_all_projects(request):
                         content_type="application/json")
 
 
+def filter_on_project(user, session, set_viewing_project_pk):
+    if set_viewing_project_pk is not None:
+        if user.project_set.filter(pk=set_viewing_project_pk).exists():
+            session['viewing_project'] = set_viewing_project_pk
+            return set_viewing_project_pk
+    return session.get('viewing_project', None)
+
+
+def populate_sidebar(request):
+    current_user = request.user
+    current_project_pk = request.session.get('viewing_project', None)
+    if current_user.is_authenticated():
+        nav_data = []
+        for project in current_user.project_set.all():
+            num_studies = project.study_set.all().count()
+            num_samples = 0
+            num_bnids = 0
+            num_reports = 0
+            for study in project.study_set.all():
+                num_samples += study.sample_set.all().count()
+                num_reports += study.report_set.all().count()
+                for sample in study.sample_set.all():
+                    num_bnids += sample.bnid_set.all().count()
+
+            project_data = {
+                'name': project.name,
+                'pk': project.pk,
+                'studies': num_studies,
+                'samples': num_samples,
+                'bnids': num_bnids,
+                'reports': num_reports,
+                'current': True if current_project_pk == str(project.pk) else False
+            }
+            nav_data.append(project_data)
+        # print nav_data
+        return render(request, 'viewer/project_dropdowns.html', {'projects': nav_data})
+    return HttpResponse('')
+
+
+def clear(request):
+    request.session.pop('viewing_project')
+    return HttpResponseRedirect('/viewer/')
 

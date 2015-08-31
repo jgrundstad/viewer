@@ -10,7 +10,7 @@ class Project(models.Model):
                                    verbose_name="Project Description")
     creation_date = models.DateTimeField('Date Created', auto_now=True,
                                          blank=True)
-    user = models.ManyToManyField(User, blank=True, null=True,
+    user = models.ManyToManyField(User, blank=True,
                                   verbose_name="Project User")
 
     def __unicode__(self):
@@ -128,10 +128,11 @@ class Recipient(models.Model):
         return self.email
 
 
-class SharedReport(models.Model):
+class SharedData(models.Model):
     uuid = UUIDField(auto=True, hyphenate=True, blank=True,
                      null=True) # defaults to v.4
-    report = models.ForeignKey(Report)
+    # report = models.ForeignKey(Report)
+    field_lookup = models.TextField(verbose_name='Field Lookup JSON')
     creation_date = models.DateField(verbose_name='Creation Date',
                                      default=datetime.date.today)
     inactive_date = models.DateField(verbose_name='Inactive Date')
@@ -141,4 +142,7 @@ class SharedReport(models.Model):
 
     def __unicode__(self):
         return str(self.uuid)
+
+    class Meta:
+        verbose_name_plural = 'Shared Data'
 
