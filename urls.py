@@ -96,6 +96,7 @@ urlpatterns = patterns('',
                        url(r'^load_variants/(?P<report_id>\d+)/$', views.load_variants,
                            name='load_variants'),
 
+                       # Share
                        url(r'^shared/view/(?P<shared_report_uuid>[\da-f\-]+)/$', views.view_shared_report,
                            name='view_shared_report'),
 
