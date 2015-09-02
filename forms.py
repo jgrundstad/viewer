@@ -1,6 +1,6 @@
 from django.contrib.admin.widgets import AdminFileWidget
 from django import forms
-from models import Project, Bnid, Sample, Caller, Report, Study
+from models import Project, Bnid, Sample, Caller, Report, Study, SharedData
 from django.contrib.auth.models import User
 
 
@@ -116,3 +116,19 @@ class StudySelectorForm(forms.Form):
     class Meta:
         fields = ['study']
         widgets = {'study': forms.Select()}
+
+
+class SharedDataForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(SharedDataForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    class Meta:
+        model = SharedData
+        fields = ['name', 'inactive_date', 'shared_recipient', 'field_lookup']
+        widgets = {
+            'field_lookup': forms.HiddenInput()
+        }

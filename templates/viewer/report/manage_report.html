@@ -66,6 +66,23 @@ jQuery(document).ready(function(){
         closeButton: 'box'
     });
 
+    var $modalShareButton = $('.igsbviewer-modal-share-button');
+    $modalShareButton.click(function(){
+        pk = $(this).data('pk');
+    });
+    new jBox('Modal', {
+        onOpen: function(){
+            this.options.ajax.url = '/viewer/shared/share_report/' + pk;
+        },
+        ajax: {
+            reload: true
+        },
+        attach: $modalShareButton,
+        overlay: true,
+        closeOnClick: 'overlay',
+        closeButton: 'box'
+    });
+
     $(".igsbviewer-view-report").click(function(){
         var pk = $(this).data('pk');
         var $csrf = $($(this).data('csrf'));
@@ -156,6 +173,7 @@ jQuery(document).ready(function(){
                 <td>
                     <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
                     <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.pk}}"></span>
+                    <span class="fa fa-2x fa-share-alt igsbviewer-modal-share-button" data-pk="{{r.pk}}"></span>
                 </td>
 
 			</tr>

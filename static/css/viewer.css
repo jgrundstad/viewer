@@ -1,3 +1,6 @@
-.igsbviewer-modal-edit-button, .igsbviewer-modal-delete-button, .igsbviewer-view-report{
+.igsbviewer-modal-edit-button,
+.igsbviewer-modal-delete-button,
+.igsbviewer-view-report,
+.igsbviewer-modal-share-button{
     cursor: pointer;
 }

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from models import Project, Bnid, Sample, Study, Caller, Report, Variant, \
-    Genome, Recipient, SharedData
+    Genome, Contact, SharedData
 
 class ProjectAdmin(admin.ModelAdmin):
     model = Project
@@ -41,8 +41,8 @@ class VariantAdmin(admin.ModelAdmin):
                     'normal_ref_count', 'normal_alt_count', 'tumor_ref_count',
                     'tumor_alt_count')
 
-class RecipientAdmin(admin.ModelAdmin):
-    model = Recipient
+class ContactAdmin(admin.ModelAdmin):
+    model = Contact
     list_display = ('full_name', 'email', 'project')
 
 class SharedDataAdmin(admin.ModelAdmin):
@@ -57,5 +57,5 @@ admin.site.register(Caller, CallerAdmin)
 admin.site.register(Report, ReportAdmin)
 admin.site.register(Genome, GenomeAdmin)
 admin.site.register(Variant, VariantAdmin)
-admin.site.register(Recipient, RecipientAdmin)
+admin.site.register(Contact, ContactAdmin)
 admin.site.register(SharedData, SharedDataAdmin)

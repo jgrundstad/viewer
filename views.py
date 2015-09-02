@@ -14,7 +14,7 @@ from datetime import date
 #from django_ajax.decorators import ajax
 
 from forms import ProjectForm, BnidForm, SampleForm, ReportForm, \
-    StudyForm, UserForm
+    StudyForm, UserForm, SharedDataForm
 from forms import StudySelectorForm
 from models import Project, Bnid, Sample, Report, Study, Variant, SharedData
 from access_tests import in_proj_user_group
@@ -450,6 +450,7 @@ def view_report(request, file_id):
     report_html = report_html.replace("<table>", replace_string)
 
     context = {'report_html': report_html,
+               'viewing_report': True,
                'filename': report_obj.report_file.name.split('/')[1],
                'study': report_obj.bnids.first().sample.study,
                'report_obj': report_obj}
@@ -476,7 +477,6 @@ def search_reports(request):
 
 
 @user_passes_test(in_proj_user_group)
-#@ajax
 def ajax_search_reports(request, search_col, search_term, search_type):
     db_lookup = '__'.join([search_col, search_type])
     print db_lookup
@@ -490,29 +490,50 @@ def ajax_search_reports(request, search_col, search_term, search_type):
 '''
 Shared Reports
 '''
-def view_shared_report(request, shared_report_uuid):
-    shared_report = SharedData.objects.filter(uuid__iexact=shared_report_uuid)
+def view_shared_data(request, shared_data_uuid):
+    shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
     if len(shared_report) == 0:
-        return HttpResponse('This report does not exist')
+        return HttpResponse('/viewer/error/shared_report_dne/')# Write this template TODO
     shared_report = shared_report[0]
     if shared_report.inactive_date < date.today():
-        return HttpResponse('This report is expired')# This report has expired
+        return HttpResponse('/viewer/error/shared_report_expired/')# Write this template TODO
 
     field_lookup = simplejson.loads(shared_report.field_lookup)
-    print field_lookup
     variants = Variant.objects.filter(**field_lookup)
-    print variants
+
     report_html = str(report_parser.json_from_ajax(variants))
-    rep = Report.objects.get(pk=7)
 
     replace_string = "<table class=\"table table-hover\" id=\"report-table\">"
     report_html = report_html.replace("<table>", replace_string)
 
     context = {'report_html': report_html,
-               'filename': rep.report_file.name.split('/')[1],
-               'study': rep.bnids.first().sample.study,
-               'report_obj': rep}
+               'viewing_report': False,
+               'shared_data_name': shared_report.name}
     return render(request, 'viewer/report/view_report.html', context)
+
+
+@user_passes_test(in_proj_user_group)
+def share_report(request, report_id):
+    if request.method == 'POST':
+        pass
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        report = Report.objects.get(pk=report_id)
+        shared_data_form = SharedDataForm(instance=SharedData(), initial={
+            'field_lookup': simplejson.dumps({'report_id': report_id})
+        })
+        shared_data_form.fields['shared_recipient'].queryset = Project.objects.get(pk=project_pk).contact_set.all()
+        context = {
+            'report_name': report.report_file.name[2:],
+            'shared_data_form': shared_data_form
+        }
+        return render(request, 'viewer/share/share_report.html', context)
+
+def manage_address_book(request):
+    return render()
+
 
 '''
 Errors
@@ -603,6 +624,8 @@ def populate_sidebar(request):
             }
             nav_data.append(project_data)
         # print nav_data
+        if len(nav_data) == 0:
+            return HttpResponse('<li><a href="#">No Projects Available</a></li>')
         return render(request, 'viewer/project_dropdowns.html', {'projects': nav_data})
     return HttpResponse('')
 
