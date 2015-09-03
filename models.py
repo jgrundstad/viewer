@@ -10,7 +10,7 @@ class Project(models.Model):
                                    verbose_name="Project Description")
     creation_date = models.DateTimeField('Date Created', auto_now=True,
                                          blank=True)
-    user = models.ManyToManyField(User, blank=True, null=True,
+    user = models.ManyToManyField(User, blank=True,
                                   verbose_name="Project User")
 
     def __unicode__(self):
@@ -119,7 +119,7 @@ class Variant(models.Model):
         return "{}:{}{}>{}".format(self.chrom, self.pos, self.ref, self.alt)
 
 
-class Recipient(models.Model):
+class Contact(models.Model):
     full_name = models.CharField(max_length=256, verbose_name='Full Name')
     email = models.EmailField(verbose_name='Email')
     project = models.ForeignKey(Project, verbose_name='Project',
@@ -129,17 +129,22 @@ class Recipient(models.Model):
         return '"{}" <{}>'.format(self.full_name, self.email)
 
 
-class SharedReport(models.Model):
+class SharedData(models.Model):
+    name = models.CharField(max_length=128, verbose_name='Shared Data Name')
     uuid = UUIDField(auto=True, hyphenate=True, blank=True,
                      null=True) # defaults to v.4
-    report = models.ForeignKey(Report)
+    # report = models.ForeignKey(Report)
+    field_lookup = models.TextField(verbose_name='Field Lookup JSON')
     creation_date = models.DateField(verbose_name='Creation Date',
                                      default=datetime.date.today)
     inactive_date = models.DateField(verbose_name='Inactive Date')
-    shared_recipient = models.ManyToManyField(Recipient,
+    shared_recipient = models.ManyToManyField(Contact,
                                               verbose_name='Shared Recipient')
     user = models.ForeignKey(User, verbose_name="Project User")
 
     def __unicode__(self):
         return str(self.uuid)
+
+    class Meta:
+        verbose_name_plural = 'Shared Data'
 

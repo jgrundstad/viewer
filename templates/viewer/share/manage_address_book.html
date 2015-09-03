@@ -7,7 +7,7 @@ $(document).ready(function(){
     new jBox('Modal', {
         attach: $('.igsbviewer-modal-add-button'),
         ajax: {
-            url: '/viewer/sample/new_sample'
+            url: '/viewer/study/new_study'
         },
         overlay: true,
         closeOnClick: 'overlay',
@@ -26,7 +26,7 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/sample/edit_sample/' + pk;
+            this.options.ajax.url = '/viewer/study/edit_study/' + pk;
         },
         ajax: {
             reload: true
@@ -38,7 +38,7 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/sample/delete_sample/' + pk;
+            this.options.ajax.url = '/viewer/study/delete_study/' + pk;
         },
         ajax: {
             reload: true
@@ -54,28 +54,24 @@ $(document).ready(function(){
 
 {% block content %}
 <div class="container">
-    <h2>{{ project_name }} | Available Samples:</h2>
+    <h2>{{ project_name }} | Available Contacts:</h2>
     <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
-        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create New Sample
+        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create New Study
     </button>
 	<table class="table table-hover">
 		<thead>
-            <tr>
-				<th>Study</th>
-				<th>Sample</th>
-				<th>Description</th>
-				<th>% Cellularity</th>
-				<th>Creation Date</th>
+			<tr>
+				<th>Study Name</th>
+                <th class="col-xs-4">Description</th>
+				<th>Created On</th>
                 <th>&nbsp;</th>
 			</tr>
 		</thead>
 			<tbody>
-				{% for s in samples %}
+				{% for s in studies %}
 				<tr>
-					<td>{{s.study}}</td>
-					<td>{{s.name}}</td>
-					<td class="col-xs-4">{{s.description}}</td>
-					<td>{{s.cellularity}}</td>
+					<td>{{s}}</td>
+					<td>{{s.description}}</td>
 					<td>{{s.creation_date}}</td>
                     <td>
                         <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{s.pk}}"></span>&nbsp;&nbsp;

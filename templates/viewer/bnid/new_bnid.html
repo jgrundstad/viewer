@@ -1,5 +1,5 @@
 <div class="container">
-	<h2>Create a New Bionimbus ID</h2>
+	<h2>Create a New Bionimbus ID | {{ project_name }}</h2>
     <form action="/viewer/bnid/new_bnid/" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in study_selector_form %}

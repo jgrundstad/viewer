@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <nav id="msidebar" class="sidebar sidebar-default sidebar-fixed-left" role="navigation">
 
     <!-- Sidebar header -->
@@ -65,83 +66,7 @@
                 Drafts
             </a>
         </li>
-        <li class="divider"></li>
-        <li class="dropdown">
-            <a class="ripple-effect dropdown-toggle" href="#" data-target="#mid">
-                PANCAN
-                <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu" id="mid">
-                <li>
-                    <a href="#" tabindex="-1">
-                        Studies
-                        <span class="sidebar-badge">4</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" tabindex="-1">
-                        Samples
-                        <span class="sidebar-badge">14</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" tabindex="-1">
-                        Bionimbus IDs
-                        <span class="sidebar-badge">6387</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" tabindex="-1">
-                        Reports
-                        <span class="sidebar-badge">23</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="dropdown">
-            <a class="ripple-effect dropdown-toggle" href="#" data-target="#mid2">
-                PsychENCODE
-                <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu" id="mid2">
-                <li>
-                    <a href="#" tabindex="-1">
-                        Studies
-                        <span class="sidebar-badge">3</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" tabindex="-1">
-                        Samples
-                        <span class="sidebar-badge">15</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" tabindex="-1">
-                        Bionimbus IDs
-                        <span class="sidebar-badge">12</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" tabindex="-1">
-                        Reports
-                        <span class="sidebar-badge">22</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <a href="#">
-                Trash
-                <span class="sidebar-badge">3</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                Spam
-                <span class="sidebar-badge">456</span>
-            </a>
-        </li>
+        <li class="divider" id="projects_dropdowns"></li>
         <li class="divider"></li>
         <li>
             <a href="#">
@@ -155,4 +80,5 @@
 
     <!-- Sidebar text -->
     <!--  <div class="sidebar-text">Text</div> -->
+    <script src="{% static 'js/material-sidebar.js' %}" ></script>
 </nav>

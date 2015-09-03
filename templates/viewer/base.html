@@ -37,17 +37,22 @@
         <!-- Custom js and css -->
         <link href="{% static 'css/viewer.css' %}" rel="stylesheet" media="screen">
 
+        {% block extra_js %}
+        {% endblock %}
         <script type="text/javascript">
             jQuery(document).ready(function(){
                 $("#content_wrapper").fadeIn(300);
                 $('#msidebar').MaterialSidebar({
                 });
+
+                $(window).keypress(function(e){
+                    if(e.which == 33){
+                        $('#msidebar').MaterialSidebar('open');
+                    }
+                });
+
             });
         </script>
-        {% block extra_js %}
-        {% endblock %}
-
-
     </head>
     <body style="padding-top: 70px">
     {% block material-sidebar %}
@@ -79,6 +84,7 @@
                             <li><a href="/viewer/bnid/">Bionimbus IDs</a></li>
                             <li><a href="/viewer/report/">Reports</a></li>
                             <li><a href="/viewer/search/">Search</a></li>
+                            <li><a href="/viewer/clear/">Clear</a></li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             {% if user.is_authenticated %}
