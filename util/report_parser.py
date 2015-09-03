@@ -186,7 +186,7 @@ def json_from_ajax(db_response):
                   headers.index('alt'), headers.index('normal_ref_count'), headers.index('normal_alt_count'),
                   headers.index('tumor_ref_count'), headers.index('tumor_alt_count')]
 
-    # Rearrage headers
+    # Rearrange headers
     new_headers = []
     for i in col_order:
         new_headers.append(headers[i])
