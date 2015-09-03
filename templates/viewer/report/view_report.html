@@ -2,59 +2,107 @@
 {% load staticfiles %}
 
 {% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.Api.register( 'column().title()', function () {
+            var colheader = this.header();
+            return $(colheader).text().trim();
+        });
+
+        var $table = $('#report-table').DataTable( {
+            aaSorting: [ [3, 'asc'], [4, 'asc'] ],
+            scrollY: 400,
+            scrollX: true,
+            autowidth: false,
+            scrollCollapse: true,
+            paging: false,
+            "dom": 'RC<"clear">lfrtip',
+            "initComplete": function(settings, json) {
+                <!--console.log('inside the thing');-->
+            }
+        });
+
+        // get header indexes
+        var colJson = {};
+        var i = 0;
+        $table.columns().every( function () {
+            var title = this.title();
+            colJson[title] = i;
+            i++;
+        });
+        <!--var to_string = JSON.stringify(colJson, null, 2);-->
+        // hide selected columns
+        var hideCols = ['id', 'report_id'];
+        for (var c in hideCols) {
+            $table.column( colJson[hideCols[c]] ).visible(false);
+        }
+
+
+
+
+    });
+</script>
 
 {% endblock %}
 
 {% block content %}
+<style>
+    td, th {
+        text-align: right;
+    }
+    td.b {
+        text-align: right;
+        font-weight: bold;
+        background-color: #c2d2cf;
+    }
+</style>
 <div class="container">
-    <style>
-        td, th {
-            text-align: right;
-        }
-        td.b {
-            text-align: right;
-            font-weight: bold;
-            background-color: #c2d2cf;
-        }
-    </style>
-    <table style="width: 250px" class="table table-bordered">
-        <thead>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="b">Report</td>
-                <td colspan="2" nowrap>{{filename}}</td>
-            </tr>
-            <tr>
-                <td class="b">Study</td>
-                <td colspan="2">{{study}}</td>
-            </tr>
-            <tr>
-                <td class="b">BionimbusIDs</td>
-                {% for b in report_obj.bnids.all %}
-                <td>{{b}}</td>
-                {% endfor %}
-            </tr>
-        </tbody>
-    </table>
+    <div class="row">
+        {% if viewing_report %}
+        <table style="width: 250px" class="table table-bordered">
+            <thead>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="b">Report</td>
+                    <td colspan="2" nowrap>{{filename}}</td>
+                </tr>
+                <tr>
+                    <td class="b">Study</td>
+                    <td colspan="2">{{study}}</td>
+                </tr>
+                <tr>
+                    <td class="b">BionimbusIDs</td>
+                    {% for b in report_obj.bnids.all %}
+                    <td>{{b}}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+        {% else %}
+            <h2>{{ shared_data_name }}</h2>
+        {% endif %}
+    </div>
+    <div class="row" style="margin-bottom:50px">
+        <small>
+            Note: columns are sortable, movable, and removable. <br>
+            'INTRON' and 'INTERGENIC' variants have been removed.
+        </small>
+        <div style="height:350px" class="scrollable-area">
+            <style>
+                th {
+                    background-color:rgba(255,255,255,1);
+                    text-align: center;
+                }
+                td {
+                    text-align: center;
+                }
+            </style>
 
+            {{report_html|safe}}
+        </div>
+    </div>
 </div>
-<small>
-    Note: columns are sortable, movable, and removable. <br>
-    'INTRON' and 'INTERGENIC' variants have been removed.
-</small>
-<div style="height: 350px;" class="scrollable-area">
-    <style>
-        th {
-            background-color:rgba(255,255,255,1);
-            text-align: center;
-        }
-        td {
-            text-align: center;
-        }
-    </style>
 
-    {{report_html|safe}}
-</div>
 
 {% endblock %}

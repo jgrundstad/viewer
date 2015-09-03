@@ -79,6 +79,19 @@ $(document).ready(function(){
             }
         });
     });
+
+    /* Search on Enter press */
+    $(document).keypress(function(e){
+        if(e.which == 13 && $('#search_box').is(':focus')){
+            $('#search').click();
+        }
+    });
+
+{#    new jBox('Modal', {#}
+{#        onOpen: function(){#}
+{##}
+{#        }#}
+{#    });#}
 });
 </script>
 {% endblock %}
@@ -140,6 +153,7 @@ $(document).ready(function(){
             </div>
         </div>
     </div>
+    <button type="button" class="btn btn-primary"><span class="fa fa-share"></span>&nbsp;&nbsp;Share</button>
 </div>
 
 {% endblock content %}

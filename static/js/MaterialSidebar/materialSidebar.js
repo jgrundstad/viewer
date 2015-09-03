@@ -23,15 +23,8 @@ $.widget('djf604.MaterialSidebar', {
         });
         widget.$sidebarOverlay.appendTo($('body'));
 
-
         /* Match dropdown elements to targets */
-        widget.$sidebarContainer.find('[data-target]').each(function(){
-            var targetId = $(this).data('target');
-            console.log('target is: ' + targetId);
-            $(this).click(function(){
-                $(targetId).stop(true, true).slideToggle();
-            });
-        });
+        widget.updateTargets();
 
         /* Attach toggle handle */
         $(widget.options.toggleSelector).click(function(){
@@ -51,6 +44,20 @@ $.widget('djf604.MaterialSidebar', {
             widget.$sidebarOverlay.removeClass('active');
         }
         console.log('workied');
+    },
+
+    updateTargets: function(){
+        var widget = this;
+        /* Match dropdown elements to targets */
+        widget.$sidebarContainer.find('[data-target]').each(function(){
+            if($(this).data('targetAttached') == 'attached') return;
+            var targetId = $(this).data('target');
+            //console.log('target is: ' + targetId);
+            $(this).click(function(){
+                $(targetId).stop(true, true).slideToggle();
+            });
+            $(this).data('targetAttached', 'attached');
+        });
     }
 });
 

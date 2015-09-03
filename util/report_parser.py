@@ -163,6 +163,7 @@ def json_from_report(filename):
     data = tablib.Dataset(*d, headers=cols)
     return data
 
+
 def json_from_ajax(db_response):
     # Make sure query returned some data
     # If not, report back empty
