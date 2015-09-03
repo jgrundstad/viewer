@@ -493,10 +493,10 @@ Shared Reports
 def view_shared_data(request, shared_data_uuid):
     shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
     if len(shared_report) == 0:
-        return HttpResponse('/viewer/error/shared_report_dne/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_dne/')# Write this template TODO
     shared_report = shared_report[0]
     if shared_report.inactive_date < date.today():
-        return HttpResponse('/viewer/error/shared_report_expired/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_expired/')# Write this template TODO
 
     field_lookup = simplejson.loads(shared_report.field_lookup)
     variants = Variant.objects.filter(**field_lookup)
@@ -511,6 +511,19 @@ def view_shared_data(request, shared_data_uuid):
                'shared_data_name': shared_report.name}
     return render(request, 'viewer/report/view_report.html', context)
 
+def view_share_data_expired(request):
+
+    # context = {'report_html': report_html,
+    #            'viewing_report': False,
+    #            'shared_data_name': shared_report.name}
+    return render(request, 'viewer/error/share_data_expired.html')
+
+def view_share_data_dne(request):
+
+    # context = {'report_html': report_html,
+    #            'viewing_report': False,
+    #            'shared_data_name': shared_report.name}
+    return render(request, 'viewer/error/share_data_dne.html')
 
 @user_passes_test(in_proj_user_group)
 def share_report(request, report_id):

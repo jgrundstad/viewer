@@ -99,7 +99,9 @@ urlpatterns = patterns('',
                        # Share
                        url(r'^shared/view/(?P<shared_data_uuid>[\da-f\-]+)/$', views.view_shared_data,
                            name='view_shared_data'),
-                       url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
+                       url(r'^error/share_data_expired/$',
+                           views.view_share_data_expired, name='view_shared_data_expired'),
+                       url(r'^error/share_data_dne/$', views.view_share_data_dne, name='share_report'),
 
                        url(r'^files/(?P<path>.*)$',
                            'django.views.static.serve',
