@@ -97,6 +97,8 @@ urlpatterns = patterns('',
                            name='load_variants'),
 
                        # Share
+                       url(r'^shared/share_report/$', views.share_report, name='share_report_post'),
+                       url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
                        url(r'^shared/view/(?P<shared_data_uuid>[\da-f\-]+)/$', views.view_shared_data,
                            name='view_shared_data'),
                        url(r'^error/share_data_expired/$',

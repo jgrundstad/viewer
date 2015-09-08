@@ -205,6 +205,10 @@ def json_from_ajax(db_response):
 
     # Parse list of variant records
     variant_records = []
+    ex_f = {}
+    ex_h = []
+    # a hack/cheat to keep dict in same order as variants
+    e = 0
     for variant in db_response:
         # Get all field names, delete report object
         field_names = Variant._meta.get_all_field_names()
@@ -213,6 +217,18 @@ def json_from_ajax(db_response):
         # Pull relevent fields from variant object
         record = []
         for key in field_names:
+            # Look for extra_info field and break out into columns, prepopulate headers but don't add values yet
+            if key == 'extra_info':
+                vals = variant.__dict__[key].split(';')
+                ex_f[e] = {}
+                for v in xrange(0,len(vals),1):
+                    (new_f,new_v) = vals[v].split('=')
+                    if new_f not in ex_h:
+                        ex_h.append(new_f)
+                    ex_f[e][new_f] = new_v
+                e += 1
+                record.append(None)
+                continue
             if key in variant.__dict__:
                 record.append(variant.__dict__[key])
 
@@ -245,8 +261,17 @@ def json_from_ajax(db_response):
                 formatted_record = add_goodies(record, headers, md_anderson_genes, eMERGE_genelist)
                 # Append this record to list of all records
                 variant_records.append(formatted_record)
-
+    headers.extend(ex_h)
     # Return as an html table
+    for z in xrange(0,e,1):
+        record = []
+        for field in ex_h:
+            if field in ex_f[z]:
+                record.append(ex_f[z][field])
+            else:
+                record.append('')
+        formatted_record = add_goodies(record, ex_h, md_anderson_genes, eMERGE_genelist)
+        variant_records[z].extend(formatted_record)
     return tablib.Dataset(*variant_records, headers=headers).html
 
 

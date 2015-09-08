@@ -11,7 +11,7 @@ import os
 import simplejson
 from datetime import date
 
-#from django_ajax.decorators import ajax
+# from django_ajax.decorators import ajax
 
 from forms import ProjectForm, BnidForm, SampleForm, ReportForm, \
     StudyForm, UserForm, SharedDataForm
@@ -76,11 +76,13 @@ def user_login(request):
         context.update(csrf(request))
         return render(request, 'viewer/login.html', context)
 
+
 def change_password(request):
     if request.method == 'POST':
         pass
 
     return HttpResponse('change password')
+
 
 def restricted(request):
     context = {}
@@ -101,12 +103,15 @@ def user_logout(request):
 '''
 Project model
 '''
+
+
 @user_passes_test(in_proj_user_group)
 def manage_project(request):
     context = {'projects': Project.objects.all()}
     context.update(csrf(request))
     return render_to_response('viewer/project/manage_project.html', context,
                               context_instance=RequestContext(request))
+
 
 @user_passes_test(in_proj_user_group)
 def new_project(request):
@@ -121,6 +126,7 @@ def new_project(request):
         context.update(csrf(request))
         return render_to_response('viewer/project/new_project.html', context,
                                   context_instance=RequestContext(request))
+
 
 @user_passes_test(in_proj_user_group)
 def edit_project(request, project_id):
@@ -140,9 +146,12 @@ def edit_project(request, project_id):
                                   context,
                                   context_instance=RequestContext(request))
 
+
 '''
 Study model
 '''
+
+
 @user_passes_test(in_proj_user_group)
 def manage_study(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
@@ -156,6 +165,7 @@ def manage_study(request, set_viewing_project_pk=None):
     context.update(csrf(request))
     return render_to_response('viewer/study/manage_study.html', context,
                               context_instance=RequestContext(request))
+
 
 @user_passes_test(in_proj_user_group)
 def new_study(request):
@@ -177,6 +187,7 @@ def new_study(request):
         return render_to_response('viewer/study/new_study.html', context,
                                   context_instance=RequestContext(request))
 
+
 @user_passes_test(in_proj_user_group)
 def edit_study(request, study_id):
     if request.method == 'POST':
@@ -193,6 +204,7 @@ def edit_study(request, study_id):
         return render_to_response('viewer/study/edit_study.html', context,
                                   context_instance=RequestContext(request))
 
+
 @user_passes_test(in_proj_user_group)
 def delete_study(request, study_id):
     if request.method == 'POST':
@@ -205,9 +217,12 @@ def delete_study(request, study_id):
         return render_to_response('viewer/study/delete_study.html', context,
                                   context_instance=RequestContext(request))
 
+
 '''
 Sample model
 '''
+
+
 @user_passes_test(in_proj_user_group)
 def manage_sample(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
@@ -220,6 +235,7 @@ def manage_sample(request, set_viewing_project_pk=None):
     }
     context.update(csrf(request))
     return render(request, 'viewer/sample/manage_sample.html', context)
+
 
 @user_passes_test(in_proj_user_group)
 def new_sample(request):
@@ -242,6 +258,7 @@ def new_sample(request):
         context.update(csrf(request))
         return render_to_response('viewer/sample/new_sample.html', context,
                                   context_instance=RequestContext(request))
+
 
 @user_passes_test(in_proj_user_group)
 def edit_sample(request, sample_id):
@@ -269,6 +286,7 @@ def edit_sample(request, sample_id):
         return render_to_response('viewer/sample/edit_sample.html', context,
                                   context_instance=RequestContext(request))
 
+
 @user_passes_test(in_proj_user_group)
 def delete_sample(request, sample_id):
     if request.method == 'POST':
@@ -280,9 +298,12 @@ def delete_sample(request, sample_id):
         context.update(csrf(request))
         return render(request, 'viewer/sample/delete_sample.html', context)
 
+
 '''
 Bionimbus ID model
 '''
+
+
 @user_passes_test(in_proj_user_group)
 def manage_bnid(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
@@ -295,10 +316,11 @@ def manage_bnid(request, set_viewing_project_pk=None):
     context.update(csrf(request))
     return render(request, 'viewer/bnid/manage_bnid.html', context)
 
+
 @user_passes_test(in_proj_user_group)
-def new_bnid(request): #study_id=None, **kwargs):
-    #if study_id:
-        #print "Got study_id: {}".format(study_id)
+def new_bnid(request):  # study_id=None, **kwargs):
+    # if study_id:
+    # print "Got study_id: {}".format(study_id)
     if request.method == 'POST':
         bform = BnidForm(request.POST, instance=Bnid())
         # print bform['sample']
@@ -319,6 +341,7 @@ def new_bnid(request): #study_id=None, **kwargs):
         context.update(csrf(request))
         return render_to_response('viewer/bnid/new_bnid.html', context,
                                   context_instance=RequestContext(request))
+
 
 @user_passes_test(in_proj_user_group)
 def edit_bnid(request, bnid_id):
@@ -347,6 +370,7 @@ def edit_bnid(request, bnid_id):
         return render_to_response('viewer/bnid/edit_bnid.html', context,
                                   context_instance=RequestContext(request))
 
+
 @user_passes_test(in_proj_user_group)
 def delete_bnid(request, bnid_id):
     if request.method == 'POST':
@@ -358,9 +382,12 @@ def delete_bnid(request, bnid_id):
         context.update(csrf(request))
         return render(request, 'viewer/bnid/delete_bnid.html', context)
 
+
 '''
 Report model
 '''
+
+
 @user_passes_test(in_proj_user_group)
 def manage_report(request, set_viewing_project_pk=None):
     project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
@@ -372,6 +399,7 @@ def manage_report(request, set_viewing_project_pk=None):
     }
     context.update(csrf(request))
     return render(request, 'viewer/report/manage_report.html', context)
+
 
 @user_passes_test(in_proj_user_group)
 def upload_report(request):
@@ -400,6 +428,7 @@ def upload_report(request):
         return render_to_response('viewer/report/upload_report.html', context,
                                   context_instance=RequestContext(request))
 
+
 @user_passes_test(in_proj_user_group)
 def edit_report(request, report_id):
     if request.method == 'POST':
@@ -423,10 +452,11 @@ def edit_report(request, report_id):
         rform.fields['study'].queryset = project.study_set.all()
         context = {'report_form': rform,
                    'report': report_obj.report_file,
-                   'pk': report_id,}
+                   'pk': report_id, }
         context.update(csrf(request))
         return render_to_response('viewer/report/edit_report.html', context,
                                   context_instance=RequestContext(request))
+
 
 @user_passes_test(in_proj_user_group)
 def view_report(request, file_id):
@@ -456,6 +486,7 @@ def view_report(request, file_id):
                'report_obj': report_obj}
     return render(request, 'viewer/report/view_report.html', context)
 
+
 def delete_report(request, report_id):
     if request.method == 'POST':
         Report.objects.get(pk=report_id).delete()
@@ -465,14 +496,17 @@ def delete_report(request, report_id):
         context = {'name': report_obj.report_file.name.strip('./'), 'pk': report_obj.pk}
         return render(request, 'viewer/report/delete_report.html', context)
 
+
 '''
 Search functions
 '''
+
+
 @user_passes_test(in_proj_user_group)
 def search_reports(request):
     variant_fields = Variant._meta.get_all_field_names()
     num_reports = len(list(set(Variant.objects.values_list('report', flat=True))))
-    context = {'variant_fields':variant_fields, 'num_reports': num_reports}
+    context = {'variant_fields': variant_fields, 'num_reports': num_reports}
     return render(request, 'viewer/search/search_reports.html', context)
 
 
@@ -481,22 +515,24 @@ def ajax_search_reports(request, search_col, search_term, search_type):
     db_lookup = '__'.join([search_col, search_type])
     print db_lookup
     variants = Variant.objects.filter(**{db_lookup: search_term})
-    #print variants[0].report.study.description
+    # print variants[0].report.study.description
     # from django.core import serializers
     # vars = serializers.serialize('json', variants)
     return HttpResponse(report_parser.json_from_ajax(variants))
-    #return report_parser.json_from_ajax(variants)
+    # return report_parser.json_from_ajax(variants)
+
 
 '''
 Shared Reports
 '''
+
 def view_shared_data(request, shared_data_uuid):
     shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
     if len(shared_report) == 0:
-        return HttpResponse('/viewer/error/shared_data_dne/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_dne/')
     shared_report = shared_report[0]
     if shared_report.inactive_date < date.today():
-        return HttpResponse('/viewer/error/shared_data_expired/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_expired/')
 
     field_lookup = simplejson.loads(shared_report.field_lookup)
     variants = Variant.objects.filter(**field_lookup)
@@ -511,19 +547,14 @@ def view_shared_data(request, shared_data_uuid):
                'shared_data_name': shared_report.name}
     return render(request, 'viewer/report/view_report.html', context)
 
-def view_share_data_expired(request):
 
-    # context = {'report_html': report_html,
-    #            'viewing_report': False,
-    #            'shared_data_name': shared_report.name}
+def view_share_data_expired(request):
     return render(request, 'viewer/error/share_data_expired.html')
 
-def view_share_data_dne(request):
 
-    # context = {'report_html': report_html,
-    #            'viewing_report': False,
-    #            'shared_data_name': shared_report.name}
+def view_share_data_dne(request):
     return render(request, 'viewer/error/share_data_dne.html')
+
 
 @user_passes_test(in_proj_user_group)
 def share_report(request, report_id):
@@ -544,6 +575,7 @@ def share_report(request, report_id):
         }
         return render(request, 'viewer/share/share_report.html', context)
 
+
 def manage_address_book(request):
     return render()
 
@@ -551,6 +583,8 @@ def manage_address_book(request):
 '''
 Errors
 '''
+
+
 def no_project(request):
     return render(request, 'viewer/error/no_project.html')
 
@@ -558,6 +592,8 @@ def no_project(request):
 '''
 Util functions
 '''
+
+
 @user_passes_test(in_proj_user_group)
 def get_samples(request, study_id=None, **kwargs):
     sample_dict = {}
@@ -646,4 +682,3 @@ def populate_sidebar(request):
 def clear(request):
     request.session.pop('viewing_project')
     return HttpResponseRedirect('/viewer/')
-
