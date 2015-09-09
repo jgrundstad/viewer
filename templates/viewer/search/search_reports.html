@@ -100,7 +100,8 @@ $(document).ready(function(){
 
 <div class="container">
     <div class="row">
-        <h2>Search Across {{num_reports}} Loaded Reports</h2>
+        <h2>{{ project_name }} | Search</h2>
+        <h4>{{ num_reports }} Loaded Report{% if num_reports != 1 %}s{% endif %}</h4>
     </div>
     <div class="row">
         <div class="col-md-2">
@@ -153,7 +154,7 @@ $(document).ready(function(){
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-primary"><span class="fa fa-share"></span>&nbsp;&nbsp;Share</button>
+    <button type="button" class="btn btn-primary"><span class="fa fa-share-alt"></span>&nbsp;&nbsp;Share</button>
 </div>
 
 {% endblock content %}

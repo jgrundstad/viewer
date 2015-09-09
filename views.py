@@ -469,23 +469,28 @@ def delete_report(request, report_id):
 Search functions
 '''
 @user_passes_test(in_proj_user_group)
-def search_reports(request):
+def search_reports(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project/')
     variant_fields = Variant._meta.get_all_field_names()
-    num_reports = len(list(set(Variant.objects.values_list('report', flat=True))))
-    context = {'variant_fields':variant_fields, 'num_reports': num_reports}
+    num_reports = len(list(set(Variant.objects.values_list('report', flat=True).filter(report__study__project__pk=project_pk))))
+    context = {
+        'variant_fields':variant_fields,
+        'num_reports': num_reports,
+        'project_name': Project.objects.get(pk=project_pk).name
+    }
     return render(request, 'viewer/search/search_reports.html', context)
 
 
 @user_passes_test(in_proj_user_group)
 def ajax_search_reports(request, search_col, search_term, search_type):
+    project_pk = request.session.get('viewing_project', None)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project/')
     db_lookup = '__'.join([search_col, search_type])
-    print db_lookup
-    variants = Variant.objects.filter(**{db_lookup: search_term})
-    #print variants[0].report.study.description
-    # from django.core import serializers
-    # vars = serializers.serialize('json', variants)
+    variants = Variant.objects.filter(**{db_lookup: search_term}).filter(report__study__project__pk=project_pk)
     return HttpResponse(report_parser.json_from_ajax(variants))
-    #return report_parser.json_from_ajax(variants)
 
 '''
 Shared Reports
@@ -493,10 +498,10 @@ Shared Reports
 def view_shared_data(request, shared_data_uuid):
     shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
     if len(shared_report) == 0:
-        return HttpResponse('/viewer/error/shared_data_dne/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_dne/')
     shared_report = shared_report[0]
     if shared_report.inactive_date < date.today():
-        return HttpResponse('/viewer/error/shared_data_expired/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_expired/')
 
     field_lookup = simplejson.loads(shared_report.field_lookup)
     variants = Variant.objects.filter(**field_lookup)
@@ -512,23 +517,25 @@ def view_shared_data(request, shared_data_uuid):
     return render(request, 'viewer/report/view_report.html', context)
 
 def view_share_data_expired(request):
-
-    # context = {'report_html': report_html,
-    #            'viewing_report': False,
-    #            'shared_data_name': shared_report.name}
     return render(request, 'viewer/error/share_data_expired.html')
 
 def view_share_data_dne(request):
-
-    # context = {'report_html': report_html,
-    #            'viewing_report': False,
-    #            'shared_data_name': shared_report.name}
     return render(request, 'viewer/error/share_data_dne.html')
 
 @user_passes_test(in_proj_user_group)
-def share_report(request, report_id):
+def share_report(request, report_id=None):
     if request.method == 'POST':
-        pass
+        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+        if shared_data_form.is_valid():
+            shared_data = shared_data_form.save(commit=False)
+            shared_data.user = request.user
+            shared_data.creation_date = date.today()
+            shared_data.save()
+            # Jason, send the email here TODO
+        return HttpResponseRedirect('/viewer/report/')
+            # I don't know that we should necessarily redirect
+            # Maybe just close the modal box, return to page?
+            # but then how do we assure success? Or report failure? TODO
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
@@ -543,6 +550,23 @@ def share_report(request, report_id):
             'shared_data_form': shared_data_form
         }
         return render(request, 'viewer/share/share_report.html', context)
+
+
+def share_search(request):
+    if request.method == 'POST':
+        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+    else:
+        shared_data_form = SharedDataForm(instance=SharedData(), initial={
+            'field_lookup': ''
+        })
+
+
+def new_shared_data(request):
+    if request.method == 'POST':
+        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+        if shared_data_form.is_valid():
+            shared_data_form.save()
+        return HttpResponseRedirect
 
 def manage_address_book(request):
     return render()

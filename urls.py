@@ -99,6 +99,8 @@ urlpatterns = patterns('',
                        # Share
                        url(r'^shared/view/(?P<shared_data_uuid>[\da-f\-]+)/$', views.view_shared_data,
                            name='view_shared_data'),
+                       url(r'^shared/share_report/$', views.share_report, name='share_report_post'),
+                       url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
                        url(r'^error/share_data_expired/$',
                            views.view_share_data_expired, name='view_shared_data_expired'),
                        url(r'^error/share_data_dne/$', views.view_share_data_dne, name='share_report'),
@@ -109,6 +111,8 @@ urlpatterns = patterns('',
 
                        # Search
                        url(r'^search/$', views.search_reports, name='search_reports'),
+                       url(r'^search/(?P<set_viewing_project_pk>\d+)/$', views.search_reports,
+                           name='search_reports_set_viewing_project_pk'),
                        url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
                            views.ajax_search_reports, name='ajax_search_reports'),
 

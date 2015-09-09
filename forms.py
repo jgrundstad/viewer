@@ -130,5 +130,6 @@ class SharedDataForm(forms.ModelForm):
         model = SharedData
         fields = ['name', 'inactive_date', 'shared_recipient', 'field_lookup']
         widgets = {
-            'field_lookup': forms.HiddenInput()
+            'field_lookup': forms.HiddenInput(),
+            'inactive_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'})
         }
