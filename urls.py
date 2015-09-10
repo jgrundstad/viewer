@@ -109,6 +109,22 @@ urlpatterns = patterns('',
                            'django.views.static.serve',
                            {'document_root': settings.MEDIA_ROOT}),
 
+                       # Contact
+                       url(r'^contact/$', views.manage_contact,
+                           name='manage_contact'),
+                       url(r'^contact/(?P<set_viewing_project_pk>\d+)/$', views.manage_contact,
+                           name='manage_contact_set_viewing_project_pk'),
+                       url(r'^contact/new_contact/$', views.new_contact,
+                           name='new_contact'),
+                       url(r'^contact/new_contact_from_share/$', views.new_contact_from_share,
+                           name='new_contact'),
+                       url(r'^contact/edit_contact/(?P<contact_id>\d+)/$', views.edit_contact,
+                           name='edit_contact'),
+                       url(r'^contact/delete_contact/(?P<contact_id>\d+)/$', views.delete_contact,
+                           name='delete_contact'),
+                       url(r'^contact/get_contacts_json/(?P<project_id>\d+)/$', views.get_contacts_json,
+                           name='get_contacts'),
+
                        # Search
                        url(r'^search/$', views.search_reports, name='search_reports'),
                        url(r'^search/(?P<set_viewing_project_pk>\d+)/$', views.search_reports,

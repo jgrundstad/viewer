@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <div class="container">
 	<h2>Share Report: {{ report_name }}</h2>
 	<form action="/viewer/shared/share_report/" method="post" enctype="multipart/form-data">
@@ -12,6 +13,13 @@
             <div class="col-sm-6">
                 {{ field }}
             </div>
+            {% if field.name == 'shared_recipient' %}
+            <div class="col-sm-2">
+                <span id="add_contact" style="cursor:pointer;" class="viewer-no-select">
+                    <span class="fa fa-plus"></span>&nbsp;Add Contact
+                </span>
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
         <div class="row">
@@ -24,3 +32,5 @@
 	</form>
 	<br/>
 </div>
+<script src="{% static 'js/share_report.js' %}" async>
+</script>

@@ -14,9 +14,9 @@ from datetime import date
 #from django_ajax.decorators import ajax
 
 from forms import ProjectForm, BnidForm, SampleForm, ReportForm, \
-    StudyForm, UserForm, SharedDataForm
+    StudyForm, UserForm, SharedDataForm, ContactForm
 from forms import StudySelectorForm
-from models import Project, Bnid, Sample, Report, Study, Variant, SharedData
+from models import Project, Bnid, Sample, Report, Study, Variant, SharedData, Contact
 from access_tests import in_proj_user_group
 
 from util import report_parser
@@ -466,6 +466,105 @@ def delete_report(request, report_id):
         return render(request, 'viewer/report/delete_report.html', context)
 
 '''
+Contact model
+'''
+@user_passes_test(in_proj_user_group)
+def manage_contact(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project')
+    project = Project.objects.get(pk=project_pk)
+    context = {
+        'contacts': project.contact_set.all(),
+        'project_name': project.name
+    }
+    context.update(csrf(request))
+    return render(request, 'viewer/contact/manage_contact.html', context)
+
+@user_passes_test(in_proj_user_group)
+def new_contact(request):
+    if request.method == 'POST':
+        contact_form = ContactForm(request.POST, instance=Contact())
+        if contact_form.is_valid():
+            contact_form.save()
+        return HttpResponseRedirect('/viewer/contact/')
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        contact_form = ContactForm(instance=Contact(), initial={'project': project_pk})
+        context = {
+            'contact_form': contact_form,
+            'project_name': Project.objects.get(pk=project_pk).name
+        }
+        context.update(csrf(request))
+        return render_to_response('viewer/contact/new_contact.html', context,
+                                  context_instance=RequestContext(request))\
+
+@user_passes_test(in_proj_user_group)
+def new_contact_from_share(request):
+    if request.method == 'POST':
+        contact_form = ContactForm(request.POST, instance=Contact())
+        if contact_form.is_valid():
+            contact_form.save()
+        return HttpResponseRedirect('/viewer/contact/')
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        contact_form = ContactForm(instance=Contact(), initial={'project': project_pk})
+        context = {
+            'contact_form': contact_form,
+            'project_name': Project.objects.get(pk=project_pk).name
+        }
+        context.update(csrf(request))
+        return render_to_response('viewer/contact/new_contact_from_share.html', context,
+                                  context_instance=RequestContext(request))
+
+@user_passes_test(in_proj_user_group)
+def edit_contact(request, contact_id):
+    if request.method == 'POST':
+        contact = Contact.objects.get(pk=contact_id)
+        updated_form = ContactForm(request.POST, instance=contact)
+        if updated_form.is_valid():
+            updated_form.save()
+            return HttpResponseRedirect('/viewer/contact/')
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        contact = Contact.objects.get(pk=contact_id)
+        contact_form = ContactForm(instance=contact)
+        context = {
+            'contact_form': contact_form,
+            'name': contact.full_name,
+            'pk': contact.pk,
+            'project_name': Project.objects.get(pk=project_pk).name
+        }
+        context.update(csrf(request))
+        return render_to_response('viewer/contact/edit_contact.html', context,
+                                  context_instance=RequestContext(request))
+
+@user_passes_test(in_proj_user_group)
+def delete_contact(request, contact_id):
+    if request.method == 'POST':
+        Contact.objects.get(pk=contact_id).delete()
+        return HttpResponseRedirect('/viewer/contact/')
+    else:
+        contact = Contact.objects.get(pk=contact_id)
+        context = {'name': contact.full_name, 'pk': contact.pk}
+        context.update(csrf(request))
+        return render(request, 'viewer/contact/delete_contact.html', context)
+
+
+def get_contacts_json(request, project_id):
+    contacts = Project.objects.get(pk=project_id).contact_set.all()
+    contacts_json = {}
+    for contact in contacts:
+        contacts_json[contact.pk] = str(contact)
+    return HttpResponse(simplejson.dumps(contacts_json))
+
+'''
 Search functions
 '''
 @user_passes_test(in_proj_user_group)
@@ -526,11 +625,13 @@ def view_share_data_dne(request):
 def share_report(request, report_id=None):
     if request.method == 'POST':
         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+        print shared_data_form
         if shared_data_form.is_valid():
             shared_data = shared_data_form.save(commit=False)
             shared_data.user = request.user
             shared_data.creation_date = date.today()
             shared_data.save()
+            shared_data_form.save_m2m()
             # Jason, send the email here TODO
         return HttpResponseRedirect('/viewer/report/')
             # I don't know that we should necessarily redirect
