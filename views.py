@@ -633,6 +633,7 @@ def share_report(request, report_id=None):
             shared_data.save()
             shared_data_form.save_m2m()
             # Jason, send the email here TODO
+            # However that is to be done
         return HttpResponseRedirect('/viewer/report/')
             # I don't know that we should necessarily redirect
             # Maybe just close the modal box, return to page?
