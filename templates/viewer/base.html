@@ -42,7 +42,7 @@
         <script type="text/javascript">
             jQuery(document).ready(function(){
                 $("#content_wrapper").fadeIn(300);
-                $('#msidebar').MaterialSidebar({
+                $('#msidebar').MaterialSidebar({toggleSelector: '#burger-toggle'
                 });
 
                 $(window).keypress(function(e){
@@ -70,8 +70,8 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand siddebar-toggle" id="test-toggle" style="cursor:pointer">
-{#                            <span class="fa fa-bars"></span>&nbsp;&nbsp;#}
+                        <a class="navbar-brand siddebar-toggle" id="burger-toggle" style="cursor:pointer">
+                            <span class="fa fa-bars"></span>&nbsp;&nbsp;
                             <img style="display:inline-block;max-height:46px; margin-top:-13px" src="http://www.igsb.org/themes/site_themes/igsb/img/logos/igsb_204x84.png">
                         </a>
                     </div>

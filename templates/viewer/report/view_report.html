@@ -10,32 +10,31 @@
         });
 
         var $table = $('#report-table').DataTable( {
-            aaSorting: [ [3, 'asc'], [4, 'asc'] ],
             scrollY: 400,
             scrollX: true,
             autowidth: false,
             scrollCollapse: true,
             paging: false,
             "dom": 'RC<"clear">lfrtip',
-            "initComplete": function(settings, json) {
-                <!--console.log('inside the thing');-->
-            }
+            <!--"initComplete": function(settings, json) {-->
+                <!--&lt;!&ndash;console.log('inside the thing');&ndash;&gt;-->
+            <!--}-->
         });
 
         // get header indexes
-        var colJson = {};
-        var i = 0;
-        $table.columns().every( function () {
-            var title = this.title();
-            colJson[title] = i;
-            i++;
-        });
+        <!--var colJson = {};-->
+        <!--var i = 0;-->
+        <!--$table.columns().every( function () {-->
+            <!--var title = this.title();-->
+            <!--colJson[title] = i;-->
+            <!--i++;-->
+        <!--});-->
         <!--var to_string = JSON.stringify(colJson, null, 2);-->
         // hide selected columns
-        var hideCols = ['id', 'report_id'];
-        for (var c in hideCols) {
-            $table.column( colJson[hideCols[c]] ).visible(false);
-        }
+        <!--var hideCols = ['id', 'report_id'];-->
+        <!--for (var c in hideCols) {-->
+            <!--$table.column( colJson[hideCols[c]] ).visible(false);-->
+        <!--}-->
 
 
 
