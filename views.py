@@ -632,8 +632,15 @@ def share_report(request, report_id=None):
             shared_data.creation_date = date.today()
             shared_data.save()
             shared_data_form.save_m2m()
-            # Jason, send the email here TODO
-            # However that is to be done
+            # Dominic, please format the email here TODO
+            to_addresses = shared_data_form['field_lookup'].value()
+            subject = 'Shared Variant Report: {}'.format(
+                shared_data_form['name'].value())
+            message = '{} {} <{}> has registered and needs to be vetted.'
+
+            send_mail(subject, message, 'jgrundstad@uchicago.edu',
+                      ['jgrundstad@uchicago.edu'], fail_silently=False)
+
         return HttpResponseRedirect('/viewer/report/')
             # I don't know that we should necessarily redirect
             # Maybe just close the modal box, return to page?
