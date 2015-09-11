@@ -1,11 +1,13 @@
 <div class="container">
-	<h2>Edit Sample: {{ name }} | {{ project_name }}</h2>
-    <form enctype="multipart/form-data" method="post" action="/viewer/sample/edit_sample/{{ pk }}/">
+	<h2>Edit Contact: {{ name }} | {{ project_name }}</h2>
+    <form enctype="multipart/form-data" method="post" action="/viewer/contact/edit_contact/{{ pk }}/">
 		{% csrf_token %}
-        {% for field in sample_form %}
+        {% for field in contact_form %}
         <div class="row" style="margin-bottom:8px">
             <div class="col-sm-2">
+                {% if field.name != 'project' %}
                 {{ field.label_tag }}
+                {% endif %}
             </div>
             <div class="col-sm-6">
                 {{ field }}

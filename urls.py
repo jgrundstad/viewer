@@ -24,6 +24,12 @@ urlpatterns = patterns('',
                                'template_name': 'viewer/change_password_done.html'
                            }, name='change-password-done'),
 
+                       url(r'^populate-sidebar/$', views.populate_sidebar, name='populate_sidebar'),
+
+                       # Errors
+                       url(r'^error/no_project/$', views.no_project, name='no_project'),
+                       url(r'^clear/$', views.clear, name='clear'),
+
                        # Project
                        url(r'^project/$', views.manage_project,
                            name='manage_project'),
@@ -38,6 +44,8 @@ urlpatterns = patterns('',
                        # Bnid
                        url(r'^bnid/$',
                            views.manage_bnid, name='manage_bnid'),
+                       url(r'^bnid/(?P<set_viewing_project_pk>\d+)/$', views.manage_bnid,
+                           name='manage_bnid_set_viewing_project_pk'),
                        url(r'^bnid/new_bnid/$',
                            views.new_bnid, name='new_bnid'),
                        url(r'^bnid/edit_bnid/(?P<bnid_id>\d+)/$',
@@ -51,6 +59,8 @@ urlpatterns = patterns('',
                        # Sample
                        url(r'^sample/$', views.manage_sample,
                            name='manage_sample'),
+                       url(r'^sample/(?P<set_viewing_project_pk>\d+)/$', views.manage_sample,
+                           name='manage_sample_set_viewing_project_pk'),
                        url(r'^sample/new_sample/$', views.new_sample,
                            name='new_sample'),
                        url(r'edit_sample/(?P<sample_id>\d+)/$', views.edit_sample,
@@ -62,6 +72,8 @@ urlpatterns = patterns('',
 
                        # Study
                        url(r'^study/$', views.manage_study, name='manage_study'),
+                       url(r'^study/(?P<set_viewing_project_pk>\d+)$', views.manage_study,
+                           name='manage_study_set_viewing_project_pk'),
                        url(r'^study/new_study/$', views.new_study, name='new_study'),
                        url(r'^study/edit_study/(?P<study_id>\d+)/$',
                            views.edit_study, name='edit_study'),
@@ -71,6 +83,8 @@ urlpatterns = patterns('',
                        # Report
                        url(r'^report/$', views.manage_report,
                            name='manage_report'),
+                       url(r'^report/(?P<set_viewing_project_pk>\d+)/$', views.manage_report,
+                           name='manage_report_set_viewing_project_pk'),
                        url(r'^report/edit_report/(?P<report_id>\d+)/$',
                            views.edit_report, name='edit_report'),
                        url(r'report/view_report/(?P<file_id>\d+)/$',
@@ -82,12 +96,39 @@ urlpatterns = patterns('',
                        url(r'^load_variants/(?P<report_id>\d+)/$', views.load_variants,
                            name='load_variants'),
 
+                       # Share
+                       url(r'^shared/view/(?P<shared_data_uuid>[\da-f\-]+)/$', views.view_shared_data,
+                           name='view_shared_data'),
+                       url(r'^shared/share_report/$', views.share_report, name='share_report_post'),
+                       url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
+                       url(r'^error/share_data_expired/$',
+                           views.view_share_data_expired, name='view_shared_data_expired'),
+                       url(r'^error/share_data_dne/$', views.view_share_data_dne, name='share_report'),
+
                        url(r'^files/(?P<path>.*)$',
                            'django.views.static.serve',
                            {'document_root': settings.MEDIA_ROOT}),
 
+                       # Contact
+                       url(r'^contact/$', views.manage_contact,
+                           name='manage_contact'),
+                       url(r'^contact/(?P<set_viewing_project_pk>\d+)/$', views.manage_contact,
+                           name='manage_contact_set_viewing_project_pk'),
+                       url(r'^contact/new_contact/$', views.new_contact,
+                           name='new_contact'),
+                       url(r'^contact/new_contact_from_share/$', views.new_contact_from_share,
+                           name='new_contact'),
+                       url(r'^contact/edit_contact/(?P<contact_id>\d+)/$', views.edit_contact,
+                           name='edit_contact'),
+                       url(r'^contact/delete_contact/(?P<contact_id>\d+)/$', views.delete_contact,
+                           name='delete_contact'),
+                       url(r'^contact/get_contacts_json/(?P<project_id>\d+)/$', views.get_contacts_json,
+                           name='get_contacts'),
+
                        # Search
                        url(r'^search/$', views.search_reports, name='search_reports'),
+                       url(r'^search/(?P<set_viewing_project_pk>\d+)/$', views.search_reports,
+                           name='search_reports_set_viewing_project_pk'),
                        url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
                            views.ajax_search_reports, name='ajax_search_reports'),
 

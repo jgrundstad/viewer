@@ -1,0 +1,36 @@
+{% load staticfiles %}
+<div class="container">
+	<h2>Share Report: {{ report_name }}</h2>
+	<form action="/viewer/shared/share_report/" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		{% for field in shared_data_form %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                {% if field.name != 'field_lookup' %}
+                {{ field.label_tag }}
+                {% endif %}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+            {% if field.name == 'shared_recipient' %}
+            <div class="col-sm-2">
+                <span id="add_contact" style="cursor:pointer;" class="viewer-no-select">
+                    <span class="fa fa-plus"></span>&nbsp;Add Contact
+                </span>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-share-alt"></span>&nbsp;&nbsp;Share
+                </button>
+            </div>
+        </div>
+	</form>
+	<br/>
+</div>
+<script src="{% static 'js/share_report.js' %}" async>
+</script>

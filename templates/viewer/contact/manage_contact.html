@@ -7,7 +7,7 @@ $(document).ready(function(){
     new jBox('Modal', {
         attach: $('.igsbviewer-modal-add-button'),
         ajax: {
-            url: '/viewer/sample/new_sample'
+            url: '/viewer/contact/new_contact/'
         },
         overlay: true,
         closeOnClick: 'overlay',
@@ -26,7 +26,7 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/sample/edit_sample/' + pk;
+            this.options.ajax.url = '/viewer/contact/edit_contact/' + pk;
         },
         ajax: {
             reload: true
@@ -38,7 +38,7 @@ $(document).ready(function(){
     });
     new jBox('Modal', {
         onOpen: function(){
-            this.options.ajax.url = '/viewer/sample/delete_sample/' + pk;
+            this.options.ajax.url = '/viewer/contact/delete_contact/' + pk;
         },
         ajax: {
             reload: true
@@ -54,32 +54,26 @@ $(document).ready(function(){
 
 {% block content %}
 <div class="container">
-    <h2>{{ project_name }} | Available Samples:</h2>
+    <h2>{{ project_name }} | Available Contacts:</h2>
     <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
-        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create New Sample
+        <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create New Contact
     </button>
 	<table class="table table-hover">
 		<thead>
-            <tr>
-				<th>Study</th>
-				<th>Sample</th>
-				<th>Description</th>
-				<th>% Cellularity</th>
-				<th>Creation Date</th>
+			<tr>
+                <th>Full Name</th>
+				<th>Email Address</th>
                 <th>&nbsp;</th>
 			</tr>
 		</thead>
 			<tbody>
-				{% for s in samples %}
+				{% for c in contacts %}
 				<tr>
-					<td>{{s.study}}</td>
-					<td>{{s.name}}</td>
-					<td class="col-xs-4">{{s.description}}</td>
-					<td>{{s.cellularity}}</td>
-					<td>{{s.creation_date}}</td>
+					<td>{{c.full_name}}</td>
+					<td>{{c.email}}</td>
                     <td>
-                        <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{s.pk}}"></span>&nbsp;&nbsp;
-                        <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{s.pk}}"></span>
+                        <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{c.pk}}"></span>&nbsp;&nbsp;
+                        <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{c.pk}}"></span>
                     </td>
 				</tr>
 				{% endfor %}

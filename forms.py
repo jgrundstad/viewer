@@ -1,6 +1,6 @@
 from django.contrib.admin.widgets import AdminFileWidget
 from django import forms
-from models import Project, Bnid, Sample, Caller, Report, Study
+from models import Project, Bnid, Sample, Caller, Report, Study, SharedData, Contact
 from django.contrib.auth.models import User
 
 
@@ -45,11 +45,13 @@ class BnidForm(forms.ModelForm):
 
 class SampleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-       super(SampleForm, self).__init__(*args, **kwargs)
-       for field in self.fields:
-           self.fields[field].widget.attrs.update({
-               'class': 'form-control'
-           })
+        super(SampleForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+        # self.fields['study'].queryset = Project.objects.get(pk=kwargs['project_pk']).study_set.all()
+
 
     class Meta:
         model = Sample
@@ -100,7 +102,9 @@ class StudyForm(forms.ModelForm):
         fields = ['project', 'name', 'description']
         widgets = {'description': forms.Textarea(attrs={'cols': 30,
                                                         'rows': 6,
-                                                        'style': 'resize:none'}),}
+                                                        'style': 'resize:none'}),
+                   'project': forms.HiddenInput()
+                  }
 
 class StudySelectorForm(forms.Form):
 
@@ -112,3 +116,38 @@ class StudySelectorForm(forms.Form):
     class Meta:
         fields = ['study']
         widgets = {'study': forms.Select()}
+
+
+class SharedDataForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(SharedDataForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    class Meta:
+        model = SharedData
+        fields = ['name', 'inactive_date', 'shared_recipient', 'field_lookup']
+        widgets = {
+            'field_lookup': forms.HiddenInput(),
+            'inactive_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'})
+        }
+
+
+class ContactForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ContactForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+        # self.fields['study'].queryset = Project.objects.get(pk=kwargs['project_pk']).study_set.all()
+
+
+    class Meta:
+        model = Contact
+        fields = ['full_name', 'email', 'project']
+        widgets = {
+            'project': forms.HiddenInput()
+        }

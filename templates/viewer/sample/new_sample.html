@@ -1,5 +1,5 @@
 <div class="container">
-	<h2>Create a New Sample</h2>
+	<h2>Create a New Sample | {{ project_name }}</h2>
 	<form action="/viewer/sample/new_sample/" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
 		{% for field in sample_form %}

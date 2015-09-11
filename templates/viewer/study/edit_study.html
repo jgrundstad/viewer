@@ -5,7 +5,9 @@
         {% for field in study_form %}
         <div class="row" style="margin-bottom:8px">
             <div class="col-sm-2">
-                {{ field.label_tag }}
+                {% if field.name != 'project' %}
+                    {{ field.label_tag }}
+                {% endif %}
             </div>
             <div class="col-sm-6">
                 {{ field }}

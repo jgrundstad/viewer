@@ -1,0 +1,46 @@
+{% for project in projects %}
+<li class="dropdown">
+    <a class="ripple-effect dropdown-toggle" href="#" data-target="#{{ project.name }}_project_dropdown">
+        {{ project.name }}
+        <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu" id="{{ project.name }}_project_dropdown"{% if project.current %} style="display:block"{% endif %}>
+        <li>
+            <a href="/viewer/study/{{ project.pk }}" tabindex="-1">
+                Studies
+                <span class="sidebar-badge">{{ project.studies }}</span>
+            </a>
+        </li>
+        <li>
+            <a href="/viewer/sample/{{ project.pk }}" tabindex="-1">
+                Samples
+                <span class="sidebar-badge">{{ project.samples }}</span>
+            </a>
+        </li>
+        <li>
+            <a href="/viewer/bnid/{{ project.pk }}" tabindex="-1">
+                Bionimbus IDs
+                <span class="sidebar-badge">{{ project.bnids }}</span>
+            </a>
+        </li>
+        <li>
+            <a href="/viewer/report/{{ project.pk }}" tabindex="-1">
+                Reports
+                <span class="sidebar-badge">{{ project.reports }}</span>
+            </a>
+        </li>
+        <li>
+            <a href="/viewer/search/{{ project.pk }}" tabindex="-1">
+                <span class="sidebar-icon fa fa-search"></span>&nbsp;&nbsp;
+                Search Reports
+            </a>
+        </li>
+        <li>
+            <a href="/viewer/contact/{{ project.pk }}" tabindex="-1">
+                <span class="sidebar-icon fa fa-users"></span>&nbsp;&nbsp;
+                Address Book
+            </a>
+        </li>
+    </ul>
+</li>
+{% endfor %}

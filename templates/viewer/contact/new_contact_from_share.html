@@ -1,0 +1,43 @@
+<div class="container">
+	<h2>Create a New Contact | {{ project_name }}</h2>
+	<form action="/viewer/contact/new_contact/" method="post" enctype="multipart/form-data" id="new_contact_form">
+		{% csrf_token %}
+		{% for field in contact_form %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                {% if field.name != 'project' %}
+                {{ field.label_tag }}
+                {% endif %}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create
+                </button>
+            </div>
+        </div>
+	</form>
+	<br/>
+</div>
+<script>
+    $(document).ready(function(){
+        $('#new_contact_form').submit(function(){
+            $.post($(this).attr('action'), $(this).serialize()).done(function(){
+                var projectId = $('#id_project').val();
+                $.getJSON('/viewer/contact/get_contacts_json/' + projectId + '/', function(data){
+                    var $sharedRecipientSelect = $('#id_shared_recipient').empty();
+                    for(var i in data){
+                        $('<option>').val(i).text(data[i]).appendTo($sharedRecipientSelect);
+                    }
+                });
+                addContactFromShareJbox.close();
+            });
+            return false;
+        });
+    });
+</script>
