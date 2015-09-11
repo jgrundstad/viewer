@@ -625,7 +625,6 @@ def view_share_data_dne(request):
 def share_report(request, report_id=None):
     if request.method == 'POST':
         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
-        print shared_data_form
         if shared_data_form.is_valid():
             shared_data = shared_data_form.save(commit=False)
             shared_data.user = request.user
@@ -636,10 +635,19 @@ def share_report(request, report_id=None):
             to_addresses = shared_data_form['field_lookup'].value()
             subject = 'Shared Variant Report: {}'.format(
                 shared_data_form['name'].value())
-            message = '{} {} <{}> has registered and needs to be vetted.'
+            absolute_uri = request.build_absolute_uri('/')
+            uuid = str(shared_data.uuid).replace('-', '')
+            share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
+            recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
 
-            send_mail(subject, message, 'jgrundstad@uchicago.edu',
-                      ['jgrundstad@uchicago.edu'], fail_silently=False)
+            message = 'A variant report has been shared with you. Go to the following link to view:<br/>'
+            message += '<a href="' + share_url + '">' + share_url + '</a>'
+
+            print subject
+            print message
+
+            send_mail(subject, message, 'no-reply@uchicago.edu',
+                      recipients, fail_silently=False)
 
         return HttpResponseRedirect('/viewer/report/')
             # I don't know that we should necessarily redirect
