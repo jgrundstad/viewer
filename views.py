@@ -632,7 +632,6 @@ def share_report(request, report_id=None):
             shared_data.save()
             shared_data_form.save_m2m()
             # Dominic, please format the email here TODO
-            to_addresses = shared_data_form['field_lookup'].value()
             subject = 'Shared Variant Report: {}'.format(
                 shared_data_form['name'].value())
             absolute_uri = request.build_absolute_uri('/')
