@@ -31,6 +31,9 @@ def scrape_mdanderson():
     with open(MD_ANDERSON_OUTFILE, 'w') as f:
         json.dump(gene_list_json, f)
 
+    driver.quit()
+    d.stop()
+
 
 def main():
     scrape_mdanderson()
