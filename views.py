@@ -639,8 +639,8 @@ def share_report(request, report_id=None):
             share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
             recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
 
-            message = 'A variant report has been shared with you. Go to the following link to view:<br/>'
-            message += '<a href="' + share_url + '">' + share_url + '</a>'
+            message = 'A variant report has been shared with you. Go to the following link to view: '
+            message += share_url
 
             print subject
             print message
@@ -781,9 +781,4 @@ def populate_sidebar(request):
             return HttpResponse('<li><a href="#">No Projects Available</a></li>')
         return render(request, 'viewer/project_dropdowns.html', {'projects': nav_data})
     return HttpResponse('')
-
-
-def clear(request):
-    request.session.pop('viewing_project')
-    return HttpResponseRedirect('/viewer/')
 
