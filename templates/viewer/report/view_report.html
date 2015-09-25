@@ -4,22 +4,23 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        $.fn.dataTable.Api.register( 'column().title()', function () {
-            var colheader = this.header();
-            return $(colheader).text().trim();
-        });
+        $('#report-table').dynatable();
+{#        $.fn.dataTable.Api.register( 'column().title()', function () {#}
+{#            var colheader = this.header();#}
+{#            return $(colheader).text().trim();#}
+{#        });#}
 
-        var $table = $('#report-table').DataTable( {
-            scrollY: 400,
-            scrollX: true,
-            autowidth: false,
-            scrollCollapse: true,
-            paging: false,
-            "dom": 'RC<"clear">lfrtip',
-            <!--"initComplete": function(settings, json) {-->
-                <!--&lt;!&ndash;console.log('inside the thing');&ndash;&gt;-->
-            <!--}-->
-        });
+{#        var $table = $('#report-table').DataTable( {#}
+{#            scrollY: 400,#}
+{#            scrollX: true,#}
+{#            autowidth: false,#}
+{#            scrollCollapse: true,#}
+{#            paging: false,#}
+{#            "dom": 'RC<"clear">lfrtip',#}
+{#            <!--"initComplete": function(settings, json) {-->#}
+{#                <!--&lt;!&ndash;console.log('inside the thing');&ndash;&gt;-->#}
+{#            <!--}-->#}
+{#        });#}
 
         // get header indexes
         <!--var colJson = {};-->
@@ -87,7 +88,7 @@
             Note: columns are sortable, movable, and removable. <br>
             'INTRON' and 'INTERGENIC' variants have been removed.
         </small>
-        <div style="height:350px" class="scrollable-area">
+        <div style="height:350px;overflow:scroll" class="scrollable-area">
             <style>
                 th {
                     background-color:rgba(255,255,255,1);

@@ -28,7 +28,6 @@ urlpatterns = patterns('',
 
                        # Errors
                        url(r'^error/no_project/$', views.no_project, name='no_project'),
-                       url(r'^clear/$', views.clear, name='clear'),
 
                        # Project
                        url(r'^project/$', views.manage_project,
