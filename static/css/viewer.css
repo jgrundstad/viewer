@@ -4,6 +4,10 @@
 .igsbviewer-modal-share-button{
     cursor: pointer;
 }
+.igsbviewer-click-icon{
+    cursor: pointer;
+    color: #2c3e50;
+}
 
 .viewer-no-select{
     -webkit-touch-callout: none;
@@ -12,4 +16,47 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.igsbviewer-card{
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
+    background-color: #fff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e7ecef;
+    margin-bottom: 1.5em;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+    overflow: hidden;
+}
+
+.igsbviewer-card > .igsbviewer-card-heading{
+    width: 100%;
+    padding: 20px 30px;
+    border-bottom: 1px solid  #e7ecef;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.igsbviewer-card > .igsbviewer-card-content{
+    padding: 30px 30px;
+}
+.igsbviewer-card > .igsbviewer-card-content-narrow{
+    padding: 15px 30px;
+}
+.igsbviewer-card > .igsbviewer-card-chart{
+    padding: 30px 30px;
+    width: 100%;
+    text-align: center;
+}
+
+.igsbviewer-section{
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+.igsbviewer-centered{
+    text-align: center;
 }

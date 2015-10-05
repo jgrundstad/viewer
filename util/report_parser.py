@@ -410,3 +410,14 @@ def export_variants_to_file(report):
     print >>export_file, '\t'.join(all_headers)
     print >>export_file, file_string
     print "Exported {} variants to {}".format(count, filename)
+
+
+def parse_extra_info(variant=None, extra_info_str=''):
+    if variant is not None:
+        extra_info_str = variant.extra_info
+    extra_info = extra_info_str.split(';')
+    extra_info_dict = {}
+    for elem in extra_info:
+        key, val = elem.split('=')
+        extra_info_dict[key] = val
+    return extra_info_dict

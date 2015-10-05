@@ -1,0 +1,152 @@
+{% load staticfiles %}
+<div>
+<!------------------->
+<!-- Sidebar Cards -->
+<!------------------->
+{% if 'reportSummary' in cards %}
+    <div class="igsbviewer-card" data-name="reportSummary" onload="reportSummary()">
+        <div class="igsbviewer-card-heading">
+            {{ report.report_file.name }}
+        </div>
+        <div class="igsbviewer-card-content">
+            <button type="button" class="btn btn-sm btn-primary">
+                <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
+                Report View
+            </button><br/>
+            <button type="button" class="btn btn-sm btn-primary">
+                <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
+                Gene View
+            </button><br/>
+            <button type="button" class="btn btn-sm btn-primary">
+                <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
+                Variant View
+            </button><br/>
+        </div>
+    </div>
+{% endif %}
+
+{% if 'geneList' in cards %}
+    <div class="igsbviewer-card" style="overflow:hidden" data-name="geneList">
+        <div class="igsbviewer-card-heading">
+            Gene List
+        </div>
+        <div class="igsbviewer-card-content">
+            {% for variant in report.variant_set.all %}
+            <p class="variant">{{ variant.gene_name }} {{ variant }}</p>
+            {% endfor %}
+        </div>
+        <script src="{% static 'js/cards/geneList.js' %}" async></script>
+    </div>
+{% endif %}
+
+<!----------------------->
+<!-- Left Column Cards -->
+<!----------------------->
+{% if 'studyDescription' in cards %}
+    <div class="igsbviewer-card" data-name="studyDescription">
+        <div class="igsbviewer-card-heading">
+            Study Description
+        </div>
+        <div class="igsbviewer-card-content">
+            <p>{{ report.study.name }}</p>
+            <p>{{ report.study.description }}</p>
+        </div>
+    </div>
+{% endif %}
+
+{% if 'scrap' in cards %}
+    <div class="igsbviewer-card" style="height:220px" data-name="scrap">
+        <div class="igsbviewer-card-content">
+            <p>Content</p>
+        </div>
+    </div>
+{% endif %}
+
+<!------------------------>
+<!-- Right Column Cards -->
+<!------------------------>
+{% if 'samplesDescription' in cards %}
+    <div class="igsbviewer-card" data-name="samplesDescription">
+        <div class="igsbviewer-card-heading">
+            Samples in {{ report.report_file }}
+        </div>
+        <div class="igsbviewer-card-content">
+            {% for sample in report.study.sample_set.all %}
+            <p>{{ sample }}<br/>{{ sample.description }}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'sample1' in cards %}
+    <div class="igsbviewer-card" data-name="sample1">
+        <div class="igsbviewer-card-heading" style="background:url('http://img15.deviantart.net/7b8e/i/2010/205/3/4/a_tree_a_mountain_and_blue_sky_by_guyalt11.jpg');background-size:cover;background-position:center;background-repeat:no-repeat">
+            These mountains are nice to look at<br/>
+            <span style="margin-left:20%">It makes for a nice visual effect</span>
+        </div>
+        <div class="igsbviewer-card-content igsbviewer-centered">
+            <p>Centered Content</p>
+        </div>
+    </div>
+{% endif %}
+
+{% if 'sample2' in cards %}
+    <div class="igsbviewer-card" data-name="sample2">
+        <div class="igsbviewer-card-heading">
+            This is the Genome
+            <span class="fa fa-flag" style="float:right"></span>
+        </div>
+        <div class="igsbviewer-card-content">
+            <p>{{ report.genome.name }}</p>
+        </div>
+    </div>
+{% endif %}
+
+{% if 'sample3' in cards %}
+    <div class="igsbviewer-card" data-name="sample3">
+        <div class="igsbviewer-card-content">
+            This is just content, no header
+        </div>
+    </div>
+{% endif %}
+
+{% if 'refalleleratio' in cards %}
+    <div class="igsbviewer-card" data-name="refalleleratio" data-chart-name="refalleleratio">
+        <div class="igsbviewer-card-heading">Reference Allele Ratio</div>
+        <div class="igsbviewer-card-chart">
+            <span class="fa fa-circle-o-notch fa-spin fa-2x"></span>
+        </div>
+        <i class="chart-vars" data-report-id="{{ report.pk }}"></i>
+    </div>
+{% endif %}
+
+{% if 'effectratio' in cards %}
+    <div class="igsbviewer-card" data-name="effectratio" data-chart-name="effectratio">
+        <div class="igsbviewer-card-heading">Effect Ratio</div>
+        <div class="igsbviewer-card-chart">
+            <span class="fa fa-circle-o-notch fa-spin fa-2x"></span>
+        </div>
+        <i class="chart-vars" data-report-id="{{ report.pk }}"></i>
+    </div>
+{% endif %}
+
+{% if 'topfivegenes' in cards %}
+    <div class="igsbviewer-card" data-name="topfivegenes" data-chart-name="topfivegenes">
+        <div class="igsbviewer-card-heading">Top 5 Genes</div>
+        <div class="igsbviewer-card-chart">
+            <span class="fa fa-circle-o-notch fa-spin fa-2x"></span>
+        </div>
+        <i class="chart-vars" data-report-id="{{ report.pk }}"></i>
+    </div>
+{% endif %}
+
+{% if 'miguelisafunnyguy' in cards %}
+    <div class="igsbviewer-card" data-name="miguelisafunnyguy">
+        <div class="igsbviewer-card-heading">Miguel is fun!</div>
+        <div class="igsbviewer-card-content">
+            But is he really?
+        </div>
+    </div>
+{% endif %}
+
+</div>
