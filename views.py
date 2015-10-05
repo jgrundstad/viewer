@@ -19,7 +19,7 @@ from forms import StudySelectorForm
 from models import Project, Bnid, Sample, Report, Study, Variant, SharedData, Contact
 from access_tests import in_proj_user_group
 
-from util import report_parser
+from util import report_parser, render_charts
 
 import tablib
 
@@ -781,4 +781,29 @@ def populate_sidebar(request):
             return HttpResponse('<li><a href="#">No Projects Available</a></li>')
         return render(request, 'viewer/project_dropdowns.html', {'projects': nav_data})
     return HttpResponse('')
+
+
+def info(request, report_id):
+    report_pk = Report.objects.get(pk=report_id).pk
+    return render(request, 'viewer/info/info.html', {'report_pk': report_pk})
+
+def cards(request, report_id):
+    card_names = request.GET.getlist('cards[]')
+    report = Report.objects.get(pk=report_id)
+    return render(request, 'viewer/cards/cards.html', {
+        'report': report,
+        'cards': card_names
+    })
+
+
+def get_series_data(request):
+    chart_name = request.GET.get('chartName')
+    kwargs = simplejson.loads(request.GET.get('chartKwargs'))
+    highchart = getattr(render_charts, chart_name)(**kwargs)
+    context = {
+        'chart_name': chart_name,
+        'highchart': highchart
+    }
+    return HttpResponse(simplejson.dumps(context))
+
 

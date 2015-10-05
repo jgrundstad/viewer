@@ -14,7 +14,14 @@
         <link href="{% static 'css/jBox.css' %}" rel="stylesheet" media="screen">
         <script src="{% static 'js/jBox.min.js' %}" type="text/javascript"></script>
 
+        <!-- Highcharts -->
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+
+        <!-- Long Click -->
+        <script src="{% static 'js/jquery.longclick-min.js' %}"></script>
+
         <link href="{% static 'css/ripples.css' %}" rel="stylesheet" media="screen">
+{#    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootcards/1.0.0/css/bootcards-desktop.min.css">#}
 
 
 
@@ -44,7 +51,7 @@
         {% endblock %}
         <script type="text/javascript">
             jQuery(document).ready(function(){
-                $("#content_wrapper").fadeIn(300);
+{#                $("#content_wrapper").fadeIn(300);#}
                 $('#msidebar').MaterialSidebar({toggleSelector: '#burger-toggle'
                 });
 
@@ -108,7 +115,8 @@
             </nav>
             <!-- Overlay for fixed sidebar -->
 
-            <div id="content_wrapper" style="display:none">
+{#            <div id="content_wrapper" style="display:none">#}
+            <div id="content_wrapper">
                 {% block precontent %}
                 {% endblock %}
                 <!-- start content block -->

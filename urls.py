@@ -131,6 +131,12 @@ urlpatterns = patterns('',
                        url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
                            views.ajax_search_reports, name='ajax_search_reports'),
 
+
+                       # Info
+                       url(r'^info/(?P<report_id>\d+)/$', views.info, name='info'),
+                       url(r'^cards/(?P<report_id>\d+)/$', views.cards, name='cards'),
+                       url(r'^get_series_data/$', views.get_series_data, name='get_series_data')
+
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

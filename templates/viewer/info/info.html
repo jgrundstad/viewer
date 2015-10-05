@@ -1,0 +1,34 @@
+{% extends 'viewer/base.html' %}
+{% load staticfiles %}
+{% block extra_js %}
+<script src="{% static 'js/info/info.js' %}"></script>
+{% endblock extra_js %}
+
+{% block content %}
+<i id="report-id" data-report-id="{{ report_pk }}"></i>
+{#<script src="{% static 'js/info/cards.js' %}"></script>#}
+<section class="container-fluid igsbviewer-section">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="igsbviewer-card">
+                <div class="igsbviewer-card-content-narrow">
+                    Search
+                    <span class="fa fa-search" style="float:right"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3" id="info-col-sidebar"></div>
+        <div class="col-sm-9">
+            <div class="row">
+                <div class="col-sm-12" id="info-col-span-both"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4" id="info-col-left"></div>
+                <div class="col-sm-8" id="info-col-right"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
