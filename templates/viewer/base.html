@@ -14,24 +14,34 @@
         <link href="{% static 'css/jBox.css' %}" rel="stylesheet" media="screen">
         <script src="{% static 'js/jBox.min.js' %}" type="text/javascript"></script>
 
+        <!-- Highcharts -->
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+
+        <!-- Long Click -->
+        <script src="{% static 'js/jquery.longclick-min.js' %}"></script>
+
         <link href="{% static 'css/ripples.css' %}" rel="stylesheet" media="screen">
+{#    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootcards/1.0.0/css/bootcards-desktop.min.css">#}
 
 
 
         <!-- Material sidebar -->
         <link href="{% static 'css/material-sidebar.css' %}" rel="stylesheet" media="screen">
-{#        <script src="{% static 'js/material-sidebar.js' %}" type="text/javascript"></script>#}
+        <script src="{% static 'js/material-sidebar.js' %}" type="text/javascript"></script>
         <script src="{% static 'js/MaterialSidebar/materialSidebar.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'js/jquery.dynatable.js' %}"></script>
+        <link href="{% static 'css/jquery.dynatable.css' %}" rel="stylesheet"/>
 
         <!-- Font Awesome -->
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <script src="{% static 'js/moment.min.js' %}" type="text/javascript"></script>
         <!-- DataTables -->
-        <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
-        <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>
-        <script type="text/javascript" src="{% static 'js/dataTables.colReorder.js' %}"></script>
-        <link href="{% static 'css/dataTables.colVis.css' %}" rel="stylesheet" media="screen">
-        <script type="text/javascript" src="{% static 'js/dataTables.colVis.js' %}"></script>
+{#        <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">#}
+{#        <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>#}
+{#        <script type="text/javascript" src="{% static 'js/dataTables.colReorder.js' %}"></script>#}
+{#        <link href="{% static 'css/dataTables.colVis.css' %}" rel="stylesheet" media="screen">#}
+{#        <script type="text/javascript" src="{% static 'js/dataTables.colVis.js' %}"></script>#}
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
         <!-- Custom js and css -->
@@ -41,8 +51,8 @@
         {% endblock %}
         <script type="text/javascript">
             jQuery(document).ready(function(){
-                $("#content_wrapper").fadeIn(300);
-                $('#msidebar').MaterialSidebar({
+{#                $("#content_wrapper").fadeIn(300);#}
+                $('#msidebar').MaterialSidebar({toggleSelector: '#burger-toggle'
                 });
 
                 $(window).keypress(function(e){
@@ -70,8 +80,8 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand siddebar-toggle" id="test-toggle" style="cursor:pointer">
-{#                            <span class="fa fa-bars"></span>&nbsp;&nbsp;#}
+                        <a class="navbar-brand siddebar-toggle" id="burger-toggle" style="cursor:pointer">
+                            <span class="fa fa-bars"></span>&nbsp;&nbsp;
                             <img style="display:inline-block;max-height:46px; margin-top:-13px" src="http://www.igsb.org/themes/site_themes/igsb/img/logos/igsb_204x84.png">
                         </a>
                     </div>
@@ -83,8 +93,6 @@
                             <li><a href="/viewer/sample/">Samples</a></li>
                             <li><a href="/viewer/bnid/">Bionimbus IDs</a></li>
                             <li><a href="/viewer/report/">Reports</a></li>
-                            <li><a href="/viewer/search/">Search</a></li>
-                            <li><a href="/viewer/clear/">Clear</a></li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
                             {% if user.is_authenticated %}
@@ -107,7 +115,8 @@
             </nav>
             <!-- Overlay for fixed sidebar -->
 
-            <div id="content_wrapper" style="display:none">
+{#            <div id="content_wrapper" style="display:none">#}
+            <div id="content_wrapper">
                 {% block precontent %}
                 {% endblock %}
                 <!-- start content block -->

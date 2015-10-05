@@ -28,7 +28,6 @@ urlpatterns = patterns('',
 
                        # Errors
                        url(r'^error/no_project/$', views.no_project, name='no_project'),
-                       url(r'^clear/$', views.clear, name='clear'),
 
                        # Project
                        url(r'^project/$', views.manage_project,
@@ -99,16 +98,44 @@ urlpatterns = patterns('',
                        # Share
                        url(r'^shared/view/(?P<shared_data_uuid>[\da-f\-]+)/$', views.view_shared_data,
                            name='view_shared_data'),
+                       url(r'^shared/share_report/$', views.share_report, name='share_report_post'),
                        url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
+                       url(r'^error/share_data_expired/$',
+                           views.view_share_data_expired, name='view_shared_data_expired'),
+                       url(r'^error/share_data_dne/$', views.view_share_data_dne, name='share_report'),
 
                        url(r'^files/(?P<path>.*)$',
                            'django.views.static.serve',
                            {'document_root': settings.MEDIA_ROOT}),
 
+                       # Contact
+                       url(r'^contact/$', views.manage_contact,
+                           name='manage_contact'),
+                       url(r'^contact/(?P<set_viewing_project_pk>\d+)/$', views.manage_contact,
+                           name='manage_contact_set_viewing_project_pk'),
+                       url(r'^contact/new_contact/$', views.new_contact,
+                           name='new_contact'),
+                       url(r'^contact/new_contact_from_share/$', views.new_contact_from_share,
+                           name='new_contact'),
+                       url(r'^contact/edit_contact/(?P<contact_id>\d+)/$', views.edit_contact,
+                           name='edit_contact'),
+                       url(r'^contact/delete_contact/(?P<contact_id>\d+)/$', views.delete_contact,
+                           name='delete_contact'),
+                       url(r'^contact/get_contacts_json/(?P<project_id>\d+)/$', views.get_contacts_json,
+                           name='get_contacts'),
+
                        # Search
                        url(r'^search/$', views.search_reports, name='search_reports'),
+                       url(r'^search/(?P<set_viewing_project_pk>\d+)/$', views.search_reports,
+                           name='search_reports_set_viewing_project_pk'),
                        url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
                            views.ajax_search_reports, name='ajax_search_reports'),
+
+
+                       # Info
+                       url(r'^info/(?P<report_id>\d+)/$', views.info, name='info'),
+                       url(r'^cards/(?P<report_id>\d+)/$', views.cards, name='cards'),
+                       url(r'^get_series_data/$', views.get_series_data, name='get_series_data')
 
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

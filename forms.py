@@ -1,6 +1,6 @@
 from django.contrib.admin.widgets import AdminFileWidget
 from django import forms
-from models import Project, Bnid, Sample, Caller, Report, Study, SharedData
+from models import Project, Bnid, Sample, Caller, Report, Study, SharedData, Contact
 from django.contrib.auth.models import User
 
 
@@ -130,5 +130,24 @@ class SharedDataForm(forms.ModelForm):
         model = SharedData
         fields = ['name', 'inactive_date', 'shared_recipient', 'field_lookup']
         widgets = {
-            'field_lookup': forms.HiddenInput()
+            'field_lookup': forms.HiddenInput(),
+            'inactive_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'})
+        }
+
+
+class ContactForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ContactForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+        # self.fields['study'].queryset = Project.objects.get(pk=kwargs['project_pk']).study_set.all()
+
+
+    class Meta:
+        model = Contact
+        fields = ['full_name', 'email', 'project']
+        widgets = {
+            'project': forms.HiddenInput()
         }

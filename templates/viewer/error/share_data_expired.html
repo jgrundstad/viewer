@@ -1,0 +1,8 @@
+{% extends 'viewer/base.html' %}
+{% load staticfiles %}
+{% block content %}
+<div class="container" style="padding: 50px; text-align: 'center';">
+    <p>This UUID has expired.  Please create a new request.</p>
+    <img src="{% static 'spoiled_milk.jpg' %}" alt="Spoiled Milk"/>
+</div>
+{% endblock content %}

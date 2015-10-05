@@ -14,12 +14,12 @@ from datetime import date
 #from django_ajax.decorators import ajax
 
 from forms import ProjectForm, BnidForm, SampleForm, ReportForm, \
-    StudyForm, UserForm, SharedDataForm
+    StudyForm, UserForm, SharedDataForm, ContactForm
 from forms import StudySelectorForm
-from models import Project, Bnid, Sample, Report, Study, Variant, SharedData
+from models import Project, Bnid, Sample, Report, Study, Variant, SharedData, Contact
 from access_tests import in_proj_user_group
 
-from util import report_parser
+from util import report_parser, render_charts
 
 import tablib
 
@@ -466,26 +466,130 @@ def delete_report(request, report_id):
         return render(request, 'viewer/report/delete_report.html', context)
 
 '''
+Contact model
+'''
+@user_passes_test(in_proj_user_group)
+def manage_contact(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project')
+    project = Project.objects.get(pk=project_pk)
+    context = {
+        'contacts': project.contact_set.all(),
+        'project_name': project.name
+    }
+    context.update(csrf(request))
+    return render(request, 'viewer/contact/manage_contact.html', context)
+
+@user_passes_test(in_proj_user_group)
+def new_contact(request):
+    if request.method == 'POST':
+        contact_form = ContactForm(request.POST, instance=Contact())
+        if contact_form.is_valid():
+            contact_form.save()
+        return HttpResponseRedirect('/viewer/contact/')
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        contact_form = ContactForm(instance=Contact(), initial={'project': project_pk})
+        context = {
+            'contact_form': contact_form,
+            'project_name': Project.objects.get(pk=project_pk).name
+        }
+        context.update(csrf(request))
+        return render_to_response('viewer/contact/new_contact.html', context,
+                                  context_instance=RequestContext(request))\
+
+@user_passes_test(in_proj_user_group)
+def new_contact_from_share(request):
+    if request.method == 'POST':
+        contact_form = ContactForm(request.POST, instance=Contact())
+        if contact_form.is_valid():
+            contact_form.save()
+        return HttpResponseRedirect('/viewer/contact/')
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        contact_form = ContactForm(instance=Contact(), initial={'project': project_pk})
+        context = {
+            'contact_form': contact_form,
+            'project_name': Project.objects.get(pk=project_pk).name
+        }
+        context.update(csrf(request))
+        return render_to_response('viewer/contact/new_contact_from_share.html', context,
+                                  context_instance=RequestContext(request))
+
+@user_passes_test(in_proj_user_group)
+def edit_contact(request, contact_id):
+    if request.method == 'POST':
+        contact = Contact.objects.get(pk=contact_id)
+        updated_form = ContactForm(request.POST, instance=contact)
+        if updated_form.is_valid():
+            updated_form.save()
+            return HttpResponseRedirect('/viewer/contact/')
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        contact = Contact.objects.get(pk=contact_id)
+        contact_form = ContactForm(instance=contact)
+        context = {
+            'contact_form': contact_form,
+            'name': contact.full_name,
+            'pk': contact.pk,
+            'project_name': Project.objects.get(pk=project_pk).name
+        }
+        context.update(csrf(request))
+        return render_to_response('viewer/contact/edit_contact.html', context,
+                                  context_instance=RequestContext(request))
+
+@user_passes_test(in_proj_user_group)
+def delete_contact(request, contact_id):
+    if request.method == 'POST':
+        Contact.objects.get(pk=contact_id).delete()
+        return HttpResponseRedirect('/viewer/contact/')
+    else:
+        contact = Contact.objects.get(pk=contact_id)
+        context = {'name': contact.full_name, 'pk': contact.pk}
+        context.update(csrf(request))
+        return render(request, 'viewer/contact/delete_contact.html', context)
+
+
+def get_contacts_json(request, project_id):
+    contacts = Project.objects.get(pk=project_id).contact_set.all()
+    contacts_json = {}
+    for contact in contacts:
+        contacts_json[contact.pk] = str(contact)
+    return HttpResponse(simplejson.dumps(contacts_json))
+
+'''
 Search functions
 '''
 @user_passes_test(in_proj_user_group)
-def search_reports(request):
+def search_reports(request, set_viewing_project_pk=None):
+    project_pk = filter_on_project(request.user, request.session, set_viewing_project_pk)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project/')
     variant_fields = Variant._meta.get_all_field_names()
-    num_reports = len(list(set(Variant.objects.values_list('report', flat=True))))
-    context = {'variant_fields':variant_fields, 'num_reports': num_reports}
+    num_reports = len(list(set(Variant.objects.values_list('report', flat=True).filter(report__study__project__pk=project_pk))))
+    context = {
+        'variant_fields':variant_fields,
+        'num_reports': num_reports,
+        'project_name': Project.objects.get(pk=project_pk).name
+    }
     return render(request, 'viewer/search/search_reports.html', context)
 
 
 @user_passes_test(in_proj_user_group)
 def ajax_search_reports(request, search_col, search_term, search_type):
+    project_pk = request.session.get('viewing_project', None)
+    if project_pk is None:
+        return HttpResponseRedirect('/viewer/error/no_project/')
     db_lookup = '__'.join([search_col, search_type])
-    print db_lookup
-    variants = Variant.objects.filter(**{db_lookup: search_term})
-    #print variants[0].report.study.description
-    # from django.core import serializers
-    # vars = serializers.serialize('json', variants)
+    variants = Variant.objects.filter(**{db_lookup: search_term}).filter(report__study__project__pk=project_pk)
     return HttpResponse(report_parser.json_from_ajax(variants))
-    #return report_parser.json_from_ajax(variants)
 
 '''
 Shared Reports
@@ -493,10 +597,10 @@ Shared Reports
 def view_shared_data(request, shared_data_uuid):
     shared_report = SharedData.objects.filter(uuid__iexact=shared_data_uuid)
     if len(shared_report) == 0:
-        return HttpResponse('/viewer/error/shared_report_dne/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_dne/')
     shared_report = shared_report[0]
     if shared_report.inactive_date < date.today():
-        return HttpResponse('/viewer/error/shared_report_expired/')# Write this template TODO
+        return HttpResponse('/viewer/error/shared_data_expired/')
 
     field_lookup = simplejson.loads(shared_report.field_lookup)
     variants = Variant.objects.filter(**field_lookup)
@@ -511,11 +615,43 @@ def view_shared_data(request, shared_data_uuid):
                'shared_data_name': shared_report.name}
     return render(request, 'viewer/report/view_report.html', context)
 
+def view_share_data_expired(request):
+    return render(request, 'viewer/error/share_data_expired.html')
+
+def view_share_data_dne(request):
+    return render(request, 'viewer/error/share_data_dne.html')
 
 @user_passes_test(in_proj_user_group)
-def share_report(request, report_id):
+def share_report(request, report_id=None):
     if request.method == 'POST':
-        pass
+        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+        if shared_data_form.is_valid():
+            shared_data = shared_data_form.save(commit=False)
+            shared_data.user = request.user
+            shared_data.creation_date = date.today()
+            shared_data.save()
+            shared_data_form.save_m2m()
+            # Dominic, please format the email here TODO
+            subject = 'Shared Variant Report: {}'.format(
+                shared_data_form['name'].value())
+            absolute_uri = request.build_absolute_uri('/')
+            uuid = str(shared_data.uuid).replace('-', '')
+            share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
+            recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
+
+            message = 'A variant report has been shared with you. Go to the following link to view: '
+            message += share_url
+
+            print subject
+            print message
+
+            send_mail(subject, message, 'no-reply@uchicago.edu',
+                      recipients, fail_silently=False)
+
+        return HttpResponseRedirect('/viewer/report/')
+            # I don't know that we should necessarily redirect
+            # Maybe just close the modal box, return to page?
+            # but then how do we assure success? Or report failure? TODO
     else:
         project_pk = request.session.get('viewing_project', None)
         if project_pk is None:
@@ -530,6 +666,23 @@ def share_report(request, report_id):
             'shared_data_form': shared_data_form
         }
         return render(request, 'viewer/share/share_report.html', context)
+
+
+def share_search(request):
+    if request.method == 'POST':
+        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+    else:
+        shared_data_form = SharedDataForm(instance=SharedData(), initial={
+            'field_lookup': ''
+        })
+
+
+def new_shared_data(request):
+    if request.method == 'POST':
+        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+        if shared_data_form.is_valid():
+            shared_data_form.save()
+        return HttpResponseRedirect
 
 def manage_address_book(request):
     return render()
@@ -630,7 +783,27 @@ def populate_sidebar(request):
     return HttpResponse('')
 
 
-def clear(request):
-    request.session.pop('viewing_project')
-    return HttpResponseRedirect('/viewer/')
+def info(request, report_id):
+    report_pk = Report.objects.get(pk=report_id).pk
+    return render(request, 'viewer/info/info.html', {'report_pk': report_pk})
+
+def cards(request, report_id):
+    card_names = request.GET.getlist('cards[]')
+    report = Report.objects.get(pk=report_id)
+    return render(request, 'viewer/cards/cards.html', {
+        'report': report,
+        'cards': card_names
+    })
+
+
+def get_series_data(request):
+    chart_name = request.GET.get('chartName')
+    kwargs = simplejson.loads(request.GET.get('chartKwargs'))
+    highchart = getattr(render_charts, chart_name)(**kwargs)
+    context = {
+        'chart_name': chart_name,
+        'highchart': highchart
+    }
+    return HttpResponse(simplejson.dumps(context))
+
 

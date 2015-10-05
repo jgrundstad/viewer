@@ -1,0 +1,26 @@
+<div class="container">
+	<h2>Create a New Contact | {{ project_name }}</h2>
+	<form action="/viewer/contact/new_contact/" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		{% for field in contact_form %}
+        <div class="row" style="margin-bottom:8px">
+            <div class="col-sm-2">
+                {% if field.name != 'project' %}
+                {{ field.label_tag }}
+                {% endif %}
+            </div>
+            <div class="col-sm-6">
+                {{ field }}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Create
+                </button>
+            </div>
+        </div>
+	</form>
+	<br/>
+</div>
