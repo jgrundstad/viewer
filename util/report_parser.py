@@ -61,7 +61,6 @@ def get_header_cols_and_delim(filehandle):
     :return:
     """
     header_line = filehandle.readline().strip()
-    #print "Header line: {}".format(header_line)
     splitby = ','
     if '\t' in header_line:
         splitby = '\t'
@@ -265,7 +264,8 @@ def report_file_formatter(filename):
     # start off in all lowercase
     cols = [x.lower() for x in header_line_dict['cols']]
     cols = [x.replace('%', 'pct') for x in cols]
-
+    cols = [x.replace('t/n', 'tn') for x in cols]
+    cols = [x.replace('T/N', 'tn') for x in cols]
     # check for mandatory columns: chr, pos, ref, alt
     missing_list = []
     for c in ['chr', 'pos', 'ref', 'alt']:
@@ -334,10 +334,11 @@ def load_into_db(report):
                         field = h
                         if '%' in h:
                             field = h.replace('%', 'pct')
-                        if '/' in h:
-                            field = h.replace('/', '')
                         data[headers.index(h)] = data[headers.index(h)].replace('%', '')
                         if data[headers.index(h)]:
+                            if h == 'tn_pct_alt_ratio' and (data[headers.index(h)] == 'NA' or data[headers.index(h)] ==
+                                '10000.00'):
+                                data[headers.index(h)] = '10000'
                             setattr(variant, field, float(data[headers.index(h)]))
                     # process the strings
                     elif variant_headers[h] == 'str':
@@ -395,7 +396,7 @@ def export_variants_to_file(report):
                 field = 'chrom' # correct this for database
             if h == 'gene':
                 field = 'gene_name'
-            if h == 't/n_pct_alt_ratio':
+            if h == 't/n_pct_alt_ratio' or h == 'T/N_%_alt_ratio':
                 field = 'tn_pct_alt_ratio'
             v_tokens[all_headers.index(h)] = getattr(v, field, '')
         for pair in v.extra_info.split(';'): # varies variant to variant
