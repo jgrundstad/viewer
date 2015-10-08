@@ -336,9 +336,10 @@ def load_into_db(report):
                             field = h.replace('%', 'pct')
                         data[headers.index(h)] = data[headers.index(h)].replace('%', '')
                         if data[headers.index(h)]:
+                            # set values that are divided by 0 to tumor alt count
                             if h == 'tn_pct_alt_ratio' and (data[headers.index(h)] == 'NA' or data[headers.index(h)] ==
                                 '10000.00'):
-                                data[headers.index(h)] = '10000'
+                                data[headers.index(h)] = data[headers.index('tumor_alt_count')]
                             setattr(variant, field, float(data[headers.index(h)]))
                     # process the strings
                     elif variant_headers[h] == 'str':
