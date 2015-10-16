@@ -4,24 +4,49 @@
 <!-- Sidebar Cards -->
 <!------------------->
 {% if 'reportSummary' in cards %}
-    <div class="igsbviewer-card" data-name="reportSummary" onload="reportSummary()">
+    <div class="igsbviewer-card" data-name="reportSummary">
         <div class="igsbviewer-card-heading">
-            {{ report.report_file.name }}
+            {{ reports.first.name }}
         </div>
         <div class="igsbviewer-card-content">
-            <button type="button" class="btn btn-sm btn-primary">
+            <button type="button" class="btn btn-sm btn-primary report-view-btn">
                 <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
                 Report View
-            </button><br/>
-            <button type="button" class="btn btn-sm btn-primary">
+            </button><br/><br/>
+            <button type="button" class="btn btn-sm btn-primary gene-view-btn">
                 <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
                 Gene View
-            </button><br/>
-            <button type="button" class="btn btn-sm btn-primary">
+            </button><br/><br/>
+            <button type="button" class="btn btn-sm btn-primary variant-view-btn">
                 <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
                 Variant View
             </button><br/>
         </div>
+        <script src="{% static 'js/cards/reportSummary.js' %}" async></script>
+    </div>
+{% endif %}
+
+{% if 'reportMultiple' in cards %}
+    <div class="igsbviewer-card" data-name="reportMultiple">
+        <div class="igsbviewer-card-heading">
+            Summary for Multiple Reports
+        </div>
+        <div class="igsbviewer-card-content">
+            <p>Reports in this summary: {{ reports_list_string }}</p>
+            <button type="button" class="btn btn-sm btn-primary report-view-btn">
+                <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
+                Report View
+            </button><br/><br/>
+            <button type="button" class="btn btn-sm btn-primary gene-view-btn">
+                <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
+                Gene View
+            </button><br/><br/>
+            <button type="button" class="btn btn-sm btn-primary variant-view-btn">
+                <span class="fa fa-file-text-o"></span>&nbsp;&nbsp;
+                Variant View
+            </button><br/>
+        </div>
+        <script src="{% static 'js/cards/reportMultiple.js' %}" async></script>
     </div>
 {% endif %}
 
@@ -31,11 +56,34 @@
             Gene List
         </div>
         <div class="igsbviewer-card-content">
-            {% for variant in report.variant_set.all %}
-            <p class="variant">{{ variant.gene_name }} {{ variant }}</p>
+            {% for one in gene_list %}
+            {% if forloop.counter|divisibleby:4 %}
+            <div class="row">
+            {% endif %}
+                <div class="col-sm-3 gene-name3" data-name="{{ one }}">
+                    {{ one }}
+                </div>
+            {% if forloop.counter|divisibleby:4 %}
+            </div>
+            {% endif %}
             {% endfor %}
         </div>
         <script src="{% static 'js/cards/geneList.js' %}" async></script>
+    </div>
+{% endif %}
+
+<!----------------------------->
+<!-- Span Both Columns Cards -->
+<!----------------------------->
+{% if 'geneProfile' in cards %}
+    <div class="igsbviewer-card" data-name="geneProfile">
+        <div class="igsbviewer-card-heading">
+            Gene Profile for {{ gene.name }}
+        </div>
+        <div class="igsbviewer-card-content">
+            Number of {{ gene.name }} in this report: {{ gene.count }}<br/>
+            {{ gene.mutations }}
+        </div>
     </div>
 {% endif %}
 
@@ -48,8 +96,8 @@
             Study Description
         </div>
         <div class="igsbviewer-card-content">
-            <p>{{ report.study.name }}</p>
-            <p>{{ report.study.description }}</p>
+            <p>{{ reports.first.study.name }}</p>
+            <p>{{ reports.first.study.description }}</p>
         </div>
     </div>
 {% endif %}
@@ -68,10 +116,10 @@
 {% if 'samplesDescription' in cards %}
     <div class="igsbviewer-card" data-name="samplesDescription">
         <div class="igsbviewer-card-heading">
-            Samples in {{ report.report_file }}
+            Samples in {{ reports.first.name }}
         </div>
         <div class="igsbviewer-card-content">
-            {% for sample in report.study.sample_set.all %}
+            {% for sample in reports.first.study.sample_set.all %}
             <p>{{ sample }}<br/>{{ sample.description }}</p>
             {% endfor %}
         </div>
@@ -97,7 +145,7 @@
             <span class="fa fa-flag" style="float:right"></span>
         </div>
         <div class="igsbviewer-card-content">
-            <p>{{ report.genome.name }}</p>
+            <p>{{ reports.0.genome.name }}</p>
         </div>
     </div>
 {% endif %}
@@ -116,7 +164,7 @@
         <div class="igsbviewer-card-chart">
             <span class="fa fa-circle-o-notch fa-spin fa-2x"></span>
         </div>
-        <i class="chart-vars" data-report-id="{{ report.pk }}"></i>
+        <i class="chart-vars" data-report-id="{{ report_ids_json }}"></i>
     </div>
 {% endif %}
 
@@ -126,7 +174,7 @@
         <div class="igsbviewer-card-chart">
             <span class="fa fa-circle-o-notch fa-spin fa-2x"></span>
         </div>
-        <i class="chart-vars" data-report-id="{{ report.pk }}"></i>
+        <i class="chart-vars" data-report-id="{{ report_ids_json }}"></i>
     </div>
 {% endif %}
 
@@ -136,7 +184,18 @@
         <div class="igsbviewer-card-chart">
             <span class="fa fa-circle-o-notch fa-spin fa-2x"></span>
         </div>
-        <i class="chart-vars" data-report-id="{{ report.pk }}"></i>
+        <i class="chart-vars" data-report-id="{{ report_ids_json }}"></i>
+{#        <script src="{% static 'js/charts/topfivegenes.js' %}" async></script>#}
+    </div>
+{% endif %}
+
+{% if 'qualitative_map' in cards %}
+    <div class="igsbviewer-card" data-name="qualitative_map" data-chart-name="qualitative_map">
+        <div class="igsbviewer-card-heading">Variants in Genes of Interest</div>
+        <div class="igsbviewer-card-chart">
+            <span class="fa fa-circle-o-notch fa-spin fa-2x"></span>
+        </div>
+        <i class="chart-vars" data-report-id="{{ report_ids_json }}" data-genes='[]'></i>
     </div>
 {% endif %}
 

@@ -94,12 +94,13 @@ urlpatterns = patterns('',
                            name='delete_report'),
                        url(r'^load_variants/(?P<report_id>\d+)/$', views.load_variants,
                            name='load_variants'),
+                       url(r'^report/zip-and-download/', views.zip_and_download, name='zip_and_download'),
 
                        # Share
                        url(r'^shared/view/(?P<shared_data_uuid>[\da-f\-]+)/$', views.view_shared_data,
                            name='view_shared_data'),
                        url(r'^shared/share_report/$', views.share_report, name='share_report_post'),
-                       url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
+                       # url(r'^shared/share_report/(?P<report_id>\d+)/$', views.share_report, name='share_report'),
                        url(r'^error/share_data_expired/$',
                            views.view_share_data_expired, name='view_shared_data_expired'),
                        url(r'^error/share_data_dne/$', views.view_share_data_dne, name='share_report'),
@@ -133,8 +134,10 @@ urlpatterns = patterns('',
 
 
                        # Info
+                       url(r'^info/$', views.info_many, name='info_many'),
                        url(r'^info/(?P<report_id>\d+)/$', views.info, name='info'),
-                       url(r'^cards/(?P<report_id>\d+)/$', views.cards, name='cards'),
+                       url(r'^cards/get/$', views.get_cards, name='get_cards'),
+                       # url(r'^cards/gene/(?P<report_id>\d+)/$', views.cards, name='cards_report'),
                        url(r'^get_series_data/$', views.get_series_data, name='get_series_data')
 
                        ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

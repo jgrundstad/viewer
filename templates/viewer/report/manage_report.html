@@ -1,100 +1,8 @@
 {% extends "viewer/base.html" %}
+{% load staticfiles %}
 
 {% block extra_js %}
-<script type="text/javascript">
-jQuery(document).ready(function(){
-    $('select[name=study]').change(function(){
-        var study_id = $(this).val();
-        var options = [];
-        var request_url = '/viewer/get_bnids_by_study/' + study_id + '/';
-        $.getJSON(
-            request_url,
-            function(data){
-                $.each(data, function(key, val) {
-                    options.push('<option value="' + key + '">' + val + '</option>');
-                });
-                $('select[name=bnids]').html(options.join('\n'));
-            }
-        );
-    });
-
-    $('select[name=bnids]').empty();
-
-    new jBox('Modal', {
-        attach: $('.igsbviewer-modal-add-button'),
-        ajax: {
-            url: '/viewer/report/upload_report'
-        },
-        overlay: true,
-        closeOnClick: 'overlay',
-        closeButton: 'box'
-    });
-    var $modalEditButton = $('.igsbviewer-modal-edit-button');
-    $modalEditButton.click(function(){
-        pk = $(this).data('pk');
-    });
-    new jBox('Modal', {
-        onOpen: function(){
-            this.options.ajax.url = '/viewer/report/edit_report/' + pk;
-        },
-        ajax: {
-            reload: true
-        },
-        attach: $modalEditButton,
-        overlay: true,
-        closeOnClick: 'overlay',
-        closeButton: 'box'
-    });
-
-    /* Set up 'delete' modal box */
-    var pk = 0;
-    var $modalDeleteButton = $('.igsbviewer-modal-delete-button');
-
-    $modalDeleteButton.click(function(){
-        pk = $(this).data('pk');
-    });
-    new jBox('Modal', {
-        onOpen: function(){
-            this.options.ajax.url = '/viewer/report/delete_report/' + pk;
-        },
-        ajax: {
-            reload: true
-        },
-        attach: $modalDeleteButton,
-        overlay: true,
-        closeOnClick: 'overlay',
-        closeButton: 'box'
-    });
-
-    var $modalShareButton = $('.igsbviewer-modal-share-button');
-    $modalShareButton.click(function(){
-        pk = $(this).data('pk');
-    });
-    new jBox('Modal', {
-        onOpen: function(){
-            this.options.ajax.url = '/viewer/shared/share_report/' + pk;
-        },
-        ajax: {
-            reload: true
-        },
-        attach: $modalShareButton,
-        overlay: true,
-        closeOnClick: 'overlay',
-        closeButton: 'box'
-    });
-
-    $(".igsbviewer-view-report").click(function(){
-        var pk = $(this).data('pk');
-        var $csrf = $($(this).data('csrf'));
-        console.log('clicked ' + pk);
-        $("<form>").attr({
-            action: '/viewer/report/view_report/' + pk + '/',
-            method: 'POST'
-        }).append($csrf).appendTo($("body")).submit();
-    });
-
-});
-</script>
+<script src="{% static 'js/report/manage_report.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -129,52 +37,65 @@ jQuery(document).ready(function(){
     <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
         <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Upload New Variant Report
     </button>
+    <button type="button" class="btn btn-primary btn-sm" id="information-dashboard">
+        <span class="fa fa-bar-chart-o"></span>&nbsp;&nbsp;Information Dashboard
+    </button>
+    <button type="button" class="btn btn-primary btn-sm" id="share-reports">
+        <span class="fa fa-share-alt"></span>&nbsp;&nbsp;Share Report(s)
+    </button>
+    <button type="button" class="btn btn-primary btn-sm" id="download-reports">
+        <span class="fa fa-download"></span>&nbsp;&nbsp;Download Report(s)
+    </button>
 	<table id="available" class="table table-hover tablesorter">
 		<thead>
 			<tr>
-				<th>Study</th>
-				<th>Sample(s)</th>
-				<th></th>
-				<th>Variants</th>
-				<th></th>
                 <th></th>
-				<th></th>
+                <th>Name</th>
+                <th></th>
+{#				<th>Study</th>#}
+{#				<th>Sample(s)</th>#}
+{#				<th></th>#}
+				<th>Variants</th>
+				<th>Date Uploaded</th>
                 <th></th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for r in reports %}
 			<tr>
-				<td>{{r.study}}</td>
-				<td>
-					{% for b in r.bnids.all %}
-						{{b.sample}} ({{b.bnid}})<br>
-					{% endfor %}
-				</td>
-				<td>{{r.genome}}<br>{{r.caller}}</td>
-                <td align="center">
-                    <h6><span class="badge">{{ r.variant_set.all | length }}</span></h6>
+                <td><label style="display:block;text-align:center"><input type="checkbox" data-reportid="{{ r.pk }}" class="multiplereports"></label></td>
+				{% if r.report_file.name %}
+                <td>
+                    {{r.name}}
                 </td>
-                {% if r.report_file.name %}
                 <td>
                     <span class="fa fa-2x fa-desktop igsbviewer-view-report" data-pk="{{r.pk}}" data-csrf="{% csrf_token %}"></span>
-                </td>
-                <td>
-                    <a href="/viewer/files/{{r.report_file.name}}">{{r.report_file.name}}</a>
                 </td>
                 {% else %}
                 <td></td>
                 <td></td>
                 {% endif %}
+{#                <td>{{r.study}}</td>#}
+{#				<td>#}
+{#					{% for b in r.bnids.all %}#}
+{#						{{b.sample}} ({{b.bnid}})<br>#}
+{#					{% endfor %}#}
+{#				</td>#}
+{#				<td>{{r.genome}}<br>{{r.caller}}</td>#}
+                <td>
+                    <h6><span class="badge">{{ r.variant_set.all | length }}</span></h6>
+                </td>
+
 				<td>{{r.upload_date}}</td>
                 <td>
 
                 </td>
                 <td>
+{#                    <a href="/viewer/files/{{r.report_file.name}}"><span class="fa fa-2x fa-download igsbviewer-click-icon" data-pk="{{r.pk}}"></span></a>&nbsp;&nbsp;#}
                     <span class="fa fa-2x fa-pencil-square-o igsbviewer-modal-edit-button" data-pk="{{r.pk}}"></span>&nbsp;&nbsp;
                     <span class="fa fa-2x fa-trash igsbviewer-modal-delete-button" data-pk="{{r.pk}}"></span>
                     <span class="fa fa-2x fa-share-alt igsbviewer-modal-share-button" data-pk="{{r.pk}}"></span>
-                    <a href="/viewer/info/{{r.pk}}"><span class="fa fa-2x fa-bar-chart-o igsbviewer-click-icon"></span></a>
+{#                    <span class="fa fa-2x fa-bar-chart-o igsbviewer-click-icon"></span>#}
                 </td>
 
 			</tr>

@@ -9,7 +9,7 @@ from django.template import RequestContext
 from django import forms
 import os
 import simplejson
-from datetime import date
+import datetime
 
 #from django_ajax.decorators import ajax
 
@@ -599,7 +599,7 @@ def view_shared_data(request, shared_data_uuid):
     if len(shared_report) == 0:
         return HttpResponse('/viewer/error/shared_data_dne/')
     shared_report = shared_report[0]
-    if shared_report.inactive_date < date.today():
+    if shared_report.inactive_date < datetime.date.today():
         return HttpResponse('/viewer/error/shared_data_expired/')
 
     field_lookup = simplejson.loads(shared_report.field_lookup)
@@ -621,51 +621,51 @@ def view_share_data_expired(request):
 def view_share_data_dne(request):
     return render(request, 'viewer/error/share_data_dne.html')
 
-@user_passes_test(in_proj_user_group)
-def share_report(request, report_id=None):
-    if request.method == 'POST':
-        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
-        if shared_data_form.is_valid():
-            shared_data = shared_data_form.save(commit=False)
-            shared_data.user = request.user
-            shared_data.creation_date = date.today()
-            shared_data.save()
-            shared_data_form.save_m2m()
-            # Dominic, please format the email here TODO
-            subject = 'Shared Variant Report: {}'.format(
-                shared_data_form['name'].value())
-            absolute_uri = request.build_absolute_uri('/')
-            uuid = str(shared_data.uuid).replace('-', '')
-            share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
-            recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
-
-            message = 'A variant report has been shared with you. Go to the following link to view: '
-            message += share_url
-
-            print subject
-            print message
-
-            send_mail(subject, message, 'no-reply@uchicago.edu',
-                      recipients, fail_silently=False)
-
-        return HttpResponseRedirect('/viewer/report/')
-            # I don't know that we should necessarily redirect
-            # Maybe just close the modal box, return to page?
-            # but then how do we assure success? Or report failure? TODO
-    else:
-        project_pk = request.session.get('viewing_project', None)
-        if project_pk is None:
-            return HttpResponseRedirect('/viewer/error/no_project')
-        report = Report.objects.get(pk=report_id)
-        shared_data_form = SharedDataForm(instance=SharedData(), initial={
-            'field_lookup': simplejson.dumps({'report_id': report_id})
-        })
-        shared_data_form.fields['shared_recipient'].queryset = Project.objects.get(pk=project_pk).contact_set.all()
-        context = {
-            'report_name': report.report_file.name[2:],
-            'shared_data_form': shared_data_form
-        }
-        return render(request, 'viewer/share/share_report.html', context)
+# @user_passes_test(in_proj_user_group)
+# def share_report(request, report_id=None):
+#     if request.method == 'POST':
+#         shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+#         if shared_data_form.is_valid():
+#             shared_data = shared_data_form.save(commit=False)
+#             shared_data.user = request.user
+#             shared_data.creation_date = date.today()
+#             shared_data.save()
+#             shared_data_form.save_m2m()
+#             # format the email better here TODO
+#             subject = 'Shared Variant Report: {}'.format(
+#                 shared_data_form['name'].value())
+#             absolute_uri = request.build_absolute_uri('/')
+#             uuid = str(shared_data.uuid).replace('-', '')
+#             share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
+#             recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
+#
+#             message = 'A variant report has been shared with you. Go to the following link to view: '
+#             message += share_url
+#
+#             print subject
+#             print message
+#
+#             send_mail(subject, message, 'no-reply@uchicago.edu',
+#                       recipients, fail_silently=False)
+#
+#         return HttpResponseRedirect('/viewer/report/')
+#             # I don't know that we should necessarily redirect
+#             # Maybe just close the modal box, return to page?
+#             # but then how do we assure success? Or report failure? TODO
+#     else:
+#         project_pk = request.session.get('viewing_project', None)
+#         if project_pk is None:
+#             return HttpResponseRedirect('/viewer/error/no_project')
+#         report = Report.objects.get(pk=report_id)
+#         shared_data_form = SharedDataForm(instance=SharedData(), initial={
+#             'field_lookup': simplejson.dumps({'report_id': report_id})
+#         })
+#         shared_data_form.fields['shared_recipient'].queryset = Project.objects.get(pk=project_pk).contact_set.all()
+#         context = {
+#             'report_name': report.report_file.name[2:],
+#             'shared_data_form': shared_data_form
+#         }
+#         return render(request, 'viewer/share/share_report.html', context)
 
 
 def share_search(request):
@@ -787,13 +787,77 @@ def info(request, report_id):
     report_pk = Report.objects.get(pk=report_id).pk
     return render(request, 'viewer/info/info.html', {'report_pk': report_pk})
 
-def cards(request, report_id):
+
+def info_many(request):
+    report_ids = request.GET.getlist('reportIds[]')
+    return render(request, 'viewer/info/info.html', {'report_ids': simplejson.dumps(report_ids)})
+
+'''
+Cards functions
+'''
+def get_cards(request):
+    context = {}
     card_names = request.GET.getlist('cards[]')
-    report = Report.objects.get(pk=report_id)
-    return render(request, 'viewer/cards/cards.html', {
-        'report': report,
+    report_ids = request.GET.getlist('report_ids[]')
+    reports = Report.objects.filter(pk__in=report_ids)
+    context.update({
+        'reports': reports,
+        'report_ids_json': simplejson.dumps(report_ids),
+        'reports_list_string': ', '.join([report.name for report in reports]),
         'cards': card_names
     })
+    if 'geneList' in card_names:
+        context.update(render_gene_list(reports))
+    if 'geneProfile' in card_names:
+        context.update(render_gene_profile(reports, request.GET.get('gene_name')))
+    return render(request, 'viewer/cards/cards.html', context)
+
+
+def render_gene_profile(reports, gene_name):
+    mutation_dict = {
+        'A>C': 0,
+        'A>G': 0,
+        'A>T': 0,
+        'C>A': 0,
+        'C>G': 0,
+        'C>T': 0,
+        'G>A': 0,
+        'G>C': 0,
+        'G>T': 0,
+        'T>A': 0,
+        'T>C': 0,
+        'T>G': 0
+    }
+    gene_count = 0
+
+    for report in reports:
+        gene = report.variant_set.filter(gene_name__exact=gene_name)
+        gene_count += gene.count()
+        for g in gene:
+            mutation_dict[g.ref + '>' + g.alt] += 1
+
+    print mutation_dict
+
+    return {
+        'gene': {
+            'name': gene_name,
+            'count': gene_count,
+            'mutations': mutation_dict
+
+        }
+    }
+
+
+def render_gene_list(reports):
+    gene_list = []
+    for report in reports:
+        for variant in report.variant_set.all():
+            if variant.gene_name not in gene_list:
+                gene_list.append(variant.gene_name)
+    gene_list.pop(gene_list.index(''))
+    return {
+        'gene_list': sorted(gene_list)
+    }
 
 
 def get_series_data(request):
@@ -806,4 +870,66 @@ def get_series_data(request):
     }
     return HttpResponse(simplejson.dumps(context))
 
+@user_passes_test(in_proj_user_group)
+def share_report(request):
+    if request.method == 'POST':
+        shared_data_form = SharedDataForm(request.POST, instance=SharedData())
+        if shared_data_form.is_valid():
+            shared_data = shared_data_form.save(commit=False)
+            shared_data.user = request.user
+            shared_data.creation_date = datetime.date.today()
+            shared_data.save()
+            shared_data_form.save_m2m()
+            # format the email better here TODO
+            subject = 'Shared Variant Report: {}'.format(
+                shared_data_form['name'].value())
+            absolute_uri = request.build_absolute_uri('/')
+            uuid = str(shared_data.uuid).replace('-', '')
+            share_url = absolute_uri + 'viewer/shared/view/' + uuid + '/'
+            recipients = [str(contact) for contact in shared_data.shared_recipient.all()]
 
+            message = 'A variant report has been shared with you. Go to the following link to view: '
+            message += share_url
+
+            print subject
+            print message
+
+            # send_mail(subject, message, 'no-reply@uchicago.edu',
+            #           recipients, fail_silently=False)
+
+        return HttpResponseRedirect('/viewer/report/')
+            # I don't know that we should necessarily redirect
+            # Maybe just close the modal box, return to page?
+            # but then how do we assure success? Or report failure? TODO
+    else:
+        project_pk = request.session.get('viewing_project', None)
+        if project_pk is None:
+            return HttpResponseRedirect('/viewer/error/no_project')
+        report_ids = request.GET.getlist('reportid')
+        reports = Report.objects.filter(pk__in=report_ids)
+        shared_data_form = SharedDataForm(instance=SharedData(), initial={
+            'field_lookup': simplejson.dumps({'report_id__in': report_ids})
+        })
+        shared_data_form.fields['shared_recipient'].queryset = Project.objects.get(pk=project_pk).contact_set.all()
+        context = {
+            'reports_name': ', '.join([report.name for report in reports]),
+            'shared_data_form': shared_data_form
+        }
+        return render(request, 'viewer/share/share_report.html', context)
+
+
+def zip_and_download(request):
+    import zipfile
+    now = datetime.datetime.now()
+    zipped_name = 'VariantViewerReports_' + ''.join(map(str, [now.year, now.month, now.day, '_', now.hour,
+                                                              now.minute, now.second]))
+    zipped_reports = zipfile.ZipFile('viewer/files/' + zipped_name + '.zip', mode='w')
+
+    report_ids = request.GET.getlist('reportids[]')
+    report_files = [report.report_file.name for report in Report.objects.filter(pk__in=report_ids)]
+    try:
+        for report_file in report_files:
+            zipped_reports.write('viewer/files/' + report_file, report_file)
+    finally:
+        zipped_reports.close()
+    return HttpResponse('/viewer/files/' + zipped_name + '.zip')
