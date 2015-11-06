@@ -78,6 +78,7 @@ class Bnid(models.Model):
 class Report(models.Model):
     caller = models.ForeignKey(Caller)
     study = models.ForeignKey(Study)
+    name = models.CharField(max_length=256, verbose_name='Report Name')
     genome = models.ForeignKey(Genome, default=1, blank=True)
     upload_date = models.DateTimeField('Date Uploaded', auto_now=True)
     bnids = models.ManyToManyField(Bnid, verbose_name='Bionimbus ID', blank=True)
@@ -131,6 +132,7 @@ class Contact(models.Model):
 
 class SharedData(models.Model):
     name = models.CharField(max_length=128, verbose_name='Shared Data Name')
+    description = models.TextField(verbose_name='Shared Data Description')
     uuid = UUIDField(auto=True, hyphenate=True, blank=True,
                      null=True) # defaults to v.4
     # report = models.ForeignKey(Report)
@@ -147,4 +149,8 @@ class SharedData(models.Model):
 
     class Meta:
         verbose_name_plural = 'Shared Data'
+
+class HotListGene(models.Model):
+    name = models.CharField(max_length=32, verbose_name='HotList Gene Name')
+
 

@@ -2,36 +2,29 @@
  * Created by dfitzgerald on 9/25/15.
  */
 var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-var reportId = 0;
+var reportIds = [];
 
-function getCards(cardNames, colAttach, animated){
+function getCards(cardNames, colAttach, animated, cardVars){
     /* Get column to load cards into */
     var $infoCol = $('#info-col-' + colAttach);
+    $infoCol.data('active', 'active');
 
     /* Get card data */
-    $.get('/viewer/cards/' + reportId + '/', {cards: cardNames}, function(data){
+    if(cardVars === undefined) cardVars = {};
+    cardVars.cards = cardNames;
+    cardVars.report_ids = reportIds;
+    $.get('/viewer/cards/get/', cardVars, function(data){
         var $cards = $(data).find('.igsbviewer-card');
         for(var i = 0; i < $cards.length; i++){
             /* Load cards in the same order as parameter cardNames */
             var $newCard = $cards.filter('.igsbviewer-card[data-name="' + cardNames[i] + '"]')
                 .addClass(animated ? 'animated fadeInUp': '')
                 .appendTo($infoCol);
+
             /* Attach event handler for sliding up card contents */
             $newCard.find('div.igsbviewer-card-heading').first().click(function(){
                 $(this).siblings().slideToggle(200);
             });
-            /* This is a special case and shouldn't stay here TODO */
-            //$newCard.find('.variant').click(function(){
-            //    clearCards('right', true);
-            //    window.setTimeout(function(){
-            //        clearCards('left', true, function(){
-            //            getCards(['studyDescription', 'barchart', 'sample2'], 'left', true);
-            //            window.setTimeout(function(){
-            //                getCards(['chart', 'samplesDescription', 'sample2', 'sample1'], 'right', true)
-            //            }, 200);
-            //        });
-            //    }, 200);
-            //});
 
             /* If card contains a chart, load chart data */
             if($newCard.data('chart-name') !== undefined){
@@ -52,8 +45,16 @@ function getCards(cardNames, colAttach, animated){
     });
 }
 
-function clearCards(colAttach, animated, callback){
+function getCardsOffset(cardNamesLeft, cardVarsLeft, cardNamesRight, cardVarsRight){
+    getCards(cardNamesLeft, 'left', true, cardVarsLeft);
+    window.setTimeout(function(){
+        getCards(cardNamesRight, 'right', true, cardVarsRight);
+    }, 200);
+}
+
+function clearCardsCol(colAttach, animated, callback){
     var $infoCol = $('#info-col-' + colAttach);
+    $infoCol.data('active', 'inactive');
     var def = new $.Deferred();
     $infoCol.find('div.igsbviewer-card')
         .removeClass('animated fadeInUp')
@@ -67,23 +68,52 @@ function clearCards(colAttach, animated, callback){
     });
 }
 
+function clearCardsOffset(finalCallback){
+    clearCardsCol('right', true);
+    window.setTimeout(function(){
+        clearCardsCol('left', true, finalCallback);
+    }, 200);
+}
+
+function clearCardsActive(finalCallback){
+    if($('#info-col-span-both').data('active') === 'active'){
+        clearCardsCol('span-both', true, finalCallback);
+    }else if($('#info-col-left').data('active') === 'active'
+             && $('#info-col-right').data('active') === 'active'){
+        clearCardsOffset(finalCallback);
+    }else{
+        if(finalCallback !== undefined) finalCallback();
+    }
+}
+
+function clearActiveAndGetOffset(cardNamesLeft, cardVarsLeft, cardNamesRight, cardVarsRight){
+    clearCardsActive(function(){
+        getCardsOffset(cardNamesLeft, cardVarsLeft, cardNamesRight, cardVarsRight);
+    });
+}
+
+function clearActiveAndGet(cardNames, col, cardVars){
+    clearCardsActive(function(){
+        getCards(cardNames, col, true, cardVars);
+    })
+}
 
 $(document).ready(function(){
-    reportId = $('#report-id').data('report-id');
-    /* Set Highcharts default options */
+    reportIds = $('#report-ids').data('report-ids');
+
+    /* Set Highchars global defaults */
     Highcharts.setOptions({
         credits: {
             enabled: false
         }
     });
 
-    //$.getScript('/viewer/js/info/cards.js');
-
     /* Load initial set of cards */
-    getCards(['reportSummary', 'geneList'], 'sidebar', false);
-    //getCards(['topfivegenes'], 'span-both', true);
-    getCards(['studyDescription', 'topfivegenes', 'sample2'], 'left', true);
-    window.setTimeout(function(){
-        getCards(['effectratio', 'refalleleratio', 'samplesDescription', 'sample2', 'sample1'], 'right', true)
-    }, 200);
+    if(reportIds.length > 1){
+        getCards(['reportMultiple'], 'sidebar', false);
+    }else{
+        getCards(['reportSummary'], 'sidebar', false);
+    }
+
+
 });

@@ -81,7 +81,7 @@ class ReportForm(forms.ModelForm):
 
     class Meta:
         model = Report
-        fields = ['study', 'bnids', 'genome', 'caller', 'report_file']
+        fields = ['name', 'study', 'bnids', 'genome', 'caller', 'report_file']
         widgets = {
             'bnids': forms.SelectMultiple(attrs={
                 'size': '10'
@@ -128,7 +128,7 @@ class SharedDataForm(forms.ModelForm):
 
     class Meta:
         model = SharedData
-        fields = ['name', 'inactive_date', 'shared_recipient', 'field_lookup']
+        fields = ['name', 'description', 'inactive_date', 'shared_recipient', 'field_lookup']
         widgets = {
             'field_lookup': forms.HiddenInput(),
             'inactive_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'})

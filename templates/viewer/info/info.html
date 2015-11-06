@@ -5,8 +5,7 @@
 {% endblock extra_js %}
 
 {% block content %}
-<i id="report-id" data-report-id="{{ report_pk }}"></i>
-{#<script src="{% static 'js/info/cards.js' %}"></script>#}
+<i id="report-ids" data-report-ids="{{ report_ids }}"></i>
 <section class="container-fluid igsbviewer-section">
     <div class="row">
         <div class="col-sm-12">
@@ -22,11 +21,11 @@
         <div class="col-sm-3" id="info-col-sidebar"></div>
         <div class="col-sm-9">
             <div class="row">
-                <div class="col-sm-12" id="info-col-span-both"></div>
+                <div class="col-sm-12" id="info-col-span-both" data-active="inactive"></div>
             </div>
             <div class="row">
-                <div class="col-sm-4" id="info-col-left"></div>
-                <div class="col-sm-8" id="info-col-right"></div>
+                <div class="col-sm-4" id="info-col-left" data-active="inactive"></div>
+                <div class="col-sm-8" id="info-col-right" data-active="inactive"></div>
             </div>
         </div>
     </div>
