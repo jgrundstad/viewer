@@ -78,7 +78,7 @@ class Bnid(models.Model):
 class Report(models.Model):
     caller = models.ForeignKey(Caller)
     study = models.ForeignKey(Study)
-    name = models.CharField(max_length=256, verbose_name='Report Name' default='report')
+    name = models.CharField(max_length=256, verbose_name='Report Name', default='report')
     genome = models.ForeignKey(Genome, default=1, blank=True)
     upload_date = models.DateTimeField('Date Uploaded', auto_now=True)
     bnids = models.ManyToManyField(Bnid, verbose_name='Bionimbus ID', blank=True)
