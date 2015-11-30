@@ -2,9 +2,11 @@ from django.contrib import admin
 from models import Project, Bnid, Sample, Study, Caller, Report, Variant, \
     Genome, Contact, SharedData
 
+
 class ProjectAdmin(admin.ModelAdmin):
     model = Project
     list_display = ('id', 'name', 'description', 'creation_date')
+    filter_horizontal = ('user', )
 
 
 class BnidAdmin(admin.ModelAdmin):
