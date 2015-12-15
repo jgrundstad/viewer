@@ -1,8 +1,3 @@
-{% extends "viewer/base.html" %}
-{% load staticfiles %}
-
-{% block extra_js %}
-<script type="text/javascript">
 $(document).ready(function(){
     $('#search').click(function(){
         /* Get handles, hide any existing event icons, show spinner */
@@ -31,10 +26,18 @@ $(document).ready(function(){
         /* Show loading cloud */
         $loading_cloud.show();
 
+        var reportIds = [];
+        $('.multiplereports').filter(':checked').each(function(){
+            reportIds.push($(this).data('reportid'));
+        });
+
+        var searchPostData = {};
+        if(reportIds.length > 0){
+            searchPostData.report_ids = JSON.stringify(reportIds);
+        }
+
         /* Make ajax call */
-        $.post(requestUrl, {
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-        }, function(data){
+        $.post(requestUrl, searchPostData, function(data){
             /* Run function once data is received */
             $loading_cloud.hide();
             if(true/*data.status >= 200 && data.status < 300*/){
@@ -87,68 +90,3 @@ $(document).ready(function(){
         }
     });
 });
-</script>
-{% endblock %}
-
-{% block content %}
-
-<div class="container">
-    <div class="row">
-        <h2>{{ project_name }} | Search</h2>
-        <h4>{{ num_reports }} Loaded Report{% if num_reports != 1 %}s{% endif %}</h4>
-    </div>
-    <div class="row">
-        <div class="col-md-2">
-            <select class="form-control" id="search_col_select">
-                {% for variant_field in variant_fields %}
-                <option value="{{ variant_field }}"{% if variant_field == "gene_name" %}selected="selected"{% endif %}>{{ variant_field }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-2">
-            <select class="form-control" id="search_type_select">
-                <option value="contains">contains</option>
-                <option value="startswith">starts with</option>
-                <option value="endswith">ends with</option>
-                <option value="exact">exactly matches</option>
-                <option value="regex">regular expression</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <div class="input-group">
-                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
-                <input type="text" class="form-control" id="search_box" placeholder="Search term..."/>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary" id="search">Search</button>
-        </div>
-    </div>
-    <div class="row" style="margin-top:25px">
-        <div class="col-xs-12">
-            <div style="text-align:center;display:none" id="loading_cloud">
-                <span class="fa fa-cloud-download fa-5x animated infinite pulse"></span>
-                <p>Searching database...</p>
-            </div>
-            <div style="text-align:center;display:none" id="error_user" class="event_icon">
-                <span class="fa fa-exclamation-triangle fa-5x animated" style="color:red"></span>
-                <p>Search term cannot be blank. Silly.</p>
-            </div>
-            <div style="text-align:center;display:none" id="error_server" class="event_icon">
-                <span class="fa fa-database fa-5x animated"></span>
-                <span class="fa fa-frown-o fa-5x" style="color:red"></span>
-                <p>Something went wrong. Terribly, horribly wrong.</p>
-            </div>
-            <div style="text-align:center;display:none" id="no_results" class="event_icon">
-                <span class="fa fa-folder-open-o fa-5x animated"></span>
-                <p>No results. Guess it's time to go home.</p>
-            </div>
-
-            <div id="table_container">
-            </div>
-        </div>
-    </div>
-    <button type="button" class="btn btn-primary"><span class="fa fa-share-alt"></span>&nbsp;&nbsp;Share</button>
-</div>
-
-{% endblock content %}

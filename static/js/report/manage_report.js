@@ -106,7 +106,7 @@ $(document).ready(function(){
     });
 
     $('#information-dashboard').click(function(){
-        reportIds = [];
+        var reportIds = [];
         $('.multiplereports').filter(':checked').each(function(){
             reportIds.push($(this).data('reportid'));
         });
