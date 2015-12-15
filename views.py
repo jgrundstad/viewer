@@ -583,12 +583,18 @@ def search_reports(request, set_viewing_project_pk=None):
 
 
 @user_passes_test(in_proj_user_group)
-def ajax_search_reports(request, search_col, search_term, search_type):
+def ajax_search_reports(request, search_col, search_term, search_type, report_ids=None):
     project_pk = request.session.get('viewing_project', None)
     if project_pk is None:
         return HttpResponseRedirect('/viewer/error/no_project/')
     db_lookup = '__'.join([search_col, search_type])
-    variants = Variant.objects.filter(**{db_lookup: search_term}).filter(report__study__project__pk=project_pk)
+    variants = Variant.objects.all()
+    if report_ids is not None:
+        variants = variants.filter(report_id__in=report_ids)
+    variants = (variants.filter(report__study__project__pk=project_pk)
+                .filter(**{db_lookup: search_term}))
+
+
     return HttpResponse(report_parser.json_from_ajax(variants))
 
 '''
