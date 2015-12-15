@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
 
 import views
 
@@ -28,6 +30,7 @@ urlpatterns = patterns('',
 
                        # Errors
                        url(r'^error/no_project/$', views.no_project, name='no_project'),
+                       url(r'^error/not-found/$', lambda request: render(request, 'viewer/error/404_error.html')),
 
                        # Project
                        url(r'^project/$', views.manage_project,
@@ -130,6 +133,8 @@ urlpatterns = patterns('',
                        url(r'^search/(?P<set_viewing_project_pk>\d+)/$', views.search_reports,
                            name='search_reports_set_viewing_project_pk'),
                        url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/$',
+                           views.ajax_search_reports, name='ajax_search_reports'),
+                       url(r'^ajax_search_reports/(?P<search_col>\S+)/(?P<search_term>\S+)/(?P<search_type>\S+)/(?P<reports_ids>\S+)/$',
                            views.ajax_search_reports, name='ajax_search_reports'),
 
 
