@@ -163,7 +163,7 @@ def qualitative_map(**kwargs):
         },
         'colors': ['#003459'],
         'title': {
-            'text': 'Miguel Should Shower More, or at Least Better'
+            'text': 'Variant status across selected reports'
         },
         'xAxis': {
             'categories': genes,
