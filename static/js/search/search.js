@@ -47,34 +47,39 @@ $(document).ready(function(){
                     $('#no_results').show().children('span').addClass('pulse');
                 }else{
                     /* If content came back, format into DataTable */
-                    console.log(data);
+                    //console.log(data);
                     var table_id = 'report-table';
                     var $result_table = $(data/*.content*/).prop({
                         'class': 'table table-hover',
                         'id': table_id
                     }).appendTo('#table_container');
-                    $result_table.DataTable({
-                        scrollY: 400,
-                        scrollX: true,
-                        autowidth: false,
-                        scrollCollapse: true,
-                        paging: false,
-                        "dom": 'RC<"clear">lfrtip'
-                    });
-
-                    /* A little visual formatting so it's visually consistent */
-                    var $result_table_wrapper = $('#' + table_id + '_wrapper');
-                    $result_table_wrapper.find('input[type="search"]')
-                            .addClass('form-control')
-                            .css({
-                                'display': 'inline',
-                                'width': 'inherit'
-                            });
-                    $result_table_wrapper.find('button.ColVis_Button')
-                            .removeClass('ColVis_Button ColVis_MasterButton')
-                            .addClass('btn btn-sm btn-primary')
-                            .css('margin-left', '0.5em');
+                    //$result_table.DataTable({
+                    //    scrollY: 400,
+                    //    scrollX: true,
+                    //    autowidth: false,
+                    //    scrollCollapse: true,
+                    //    paging: false,
+                    //    "dom": 'RC<"clear">lfrtip'
+                    //});
+                    //
+                    ///* A little visual formatting so it's visually consistent */
+                    //var $result_table_wrapper = $('#' + table_id + '_wrapper');
+                    //$result_table_wrapper.find('input[type="search"]')
+                    //        .addClass('form-control')
+                    //        .css({
+                    //            'display': 'inline',
+                    //            'width': 'inherit'
+                    //        });
+                    //$result_table_wrapper.find('button.ColVis_Button')
+                    //        .removeClass('ColVis_Button ColVis_MasterButton')
+                    //        .addClass('btn btn-sm btn-primary')
+                    //        .css('margin-left', '0.5em');
                 }
+
+                var newWindowHtml = $('#search-data-area').html();
+                console.log(newWindowHtml)
+                var w = window.open();
+                w.document.writeln(newWindowHtml);
             }else{
                 /* If status code was not 2xx, report server error to user */
                 $('#error_server').show()
