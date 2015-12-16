@@ -105,9 +105,10 @@
 		<thead>
 			<tr>
                 <th></th>
+                <th>Study</th>
                 <th>Name</th>
+
                 <th></th>
-{#				<th>Study</th>#}
 {#				<th>Sample(s)</th>#}
 {#				<th></th>#}
 				<th>Variants</th>
@@ -121,6 +122,9 @@
                 <td><label style="display:block;text-align:center"><input type="checkbox" data-reportid="{{ r.pk }}" class="multiplereports"></label></td>
 				{% if r.report_file.name %}
                 <td>
+                    {{r.study}}
+                </td>
+                <td>
                     {{r.name}}
                 </td>
                 <td>
@@ -130,7 +134,7 @@
                 <td></td>
                 <td></td>
                 {% endif %}
-{#                <td>{{r.study}}</td>#}
+
 {#				<td>#}
 {#					{% for b in r.bnids.all %}#}
 {#						{{b.sample}} ({{b.bnid}})<br>#}
