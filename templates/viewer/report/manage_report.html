@@ -3,6 +3,7 @@
 
 {% block extra_js %}
 <script src="{% static 'js/report/manage_report.js' %}"></script>
+<script src="{% static 'js/search/search.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -34,13 +35,67 @@
 <!-- End Modal box content -->
 <div class="container">
 	<h2>{{ project_name }} | Available Variant Reports:</h2>
+
+    <div class="row">
+        <div class="col-md-2">
+            <select class="form-control" id="search_col_select">
+                {% for variant_field in variant_fields %}
+                <option value="{{ variant_field }}"{% if variant_field == "gene_name" %}selected="selected"{% endif %}>{{ variant_field }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="search_type_select">
+                <option value="contains">contains</option>
+                <option value="startswith">starts with</option>
+                <option value="endswith">ends with</option>
+                <option value="exact">exactly matches</option>
+                <option value="regex">regular expression</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                <input type="text" class="form-control" id="search_box" placeholder="Search term..."/>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary" id="search">Search</button>
+        </div>
+    </div>
+
+    <div class="row" id="search-data-area" style="margin-bottom:50px;max-height:300px;overflow:auto">
+        <div class="col-xs-12">
+            <div style="text-align:center;display:none" id="loading_cloud">
+                <span class="fa fa-cloud-download fa-5x animated infinite pulse"></span>
+                <p>Searching database...</p>
+            </div>
+            <div style="text-align:center;display:none" id="error_user" class="event_icon">
+                <span class="fa fa-exclamation-triangle fa-5x animated" style="color:red"></span>
+                <p>Search term cannot be blank. Silly.</p>
+            </div>
+            <div style="text-align:center;display:none" id="error_server" class="event_icon">
+                <span class="fa fa-database fa-5x animated"></span>
+                <span class="fa fa-frown-o fa-5x" style="color:red"></span>
+                <p>Something went wrong. Terribly, horribly wrong.</p>
+            </div>
+            <div style="text-align:center;display:none" id="no_results" class="event_icon">
+                <span class="fa fa-folder-open-o fa-5x animated"></span>
+                <p>No results. Guess it's time to go home.</p>
+            </div>
+
+            <div id="table_container">
+            </div>
+        </div>
+    </div>
+
     <button type="button" class="btn btn-primary btn-sm igsbviewer-modal-add-button">
         <span class="fa fa-plus-square"></span>&nbsp;&nbsp;Upload New Variant Report
     </button>
     <button type="button" class="btn btn-primary btn-sm" id="information-dashboard">
         <span class="fa fa-bar-chart-o"></span>&nbsp;&nbsp;Information Dashboard
     </button>
-    <button type="button" class="btn btn-primary btn-sm" id="share-reports">
+    <button type="button" class="btn btn-primary btn-sm" id="share-reports" disabled="disabled">
         <span class="fa fa-share-alt"></span>&nbsp;&nbsp;Share Report(s)
     </button>
     <button type="button" class="btn btn-primary btn-sm" id="download-reports">
@@ -50,9 +105,10 @@
 		<thead>
 			<tr>
                 <th></th>
+                <th>Study</th>
                 <th>Name</th>
+
                 <th></th>
-{#				<th>Study</th>#}
 {#				<th>Sample(s)</th>#}
 {#				<th></th>#}
 				<th>Variants</th>
@@ -66,6 +122,9 @@
                 <td><label style="display:block;text-align:center"><input type="checkbox" data-reportid="{{ r.pk }}" class="multiplereports"></label></td>
 				{% if r.report_file.name %}
                 <td>
+                    {{r.study}}
+                </td>
+                <td>
                     {{r.name}}
                 </td>
                 <td>
@@ -75,7 +134,7 @@
                 <td></td>
                 <td></td>
                 {% endif %}
-{#                <td>{{r.study}}</td>#}
+
 {#				<td>#}
 {#					{% for b in r.bnids.all %}#}
 {#						{{b.sample}} ({{b.bnid}})<br>#}

@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
+from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import os
 import simplejson
@@ -368,7 +369,8 @@ def manage_report(request, set_viewing_project_pk=None):
         return HttpResponseRedirect('/viewer/error/no_project/')
     context = {
         'reports': Report.objects.filter(study__project__pk=project_pk),
-        'project_name': Project.objects.get(pk=project_pk).name
+        'project_name': Project.objects.get(pk=project_pk).name,
+        'variant_fields': Variant._meta.get_all_field_names()
     }
     context.update(csrf(request))
     return render(request, 'viewer/report/manage_report.html', context)
@@ -583,12 +585,20 @@ def search_reports(request, set_viewing_project_pk=None):
 
 
 @user_passes_test(in_proj_user_group)
+@csrf_exempt
 def ajax_search_reports(request, search_col, search_term, search_type):
     project_pk = request.session.get('viewing_project', None)
     if project_pk is None:
         return HttpResponseRedirect('/viewer/error/no_project/')
     db_lookup = '__'.join([search_col, search_type])
-    variants = Variant.objects.filter(**{db_lookup: search_term}).filter(report__study__project__pk=project_pk)
+    variants = Variant.objects.all()
+    if request.POST.get('report_ids'):
+        report_ids = simplejson.loads(request.POST.get('report_ids'))
+        variants = variants.filter(report_id__in=report_ids)
+    variants = (variants.filter(report__study__project__pk=project_pk)
+                .filter(**{db_lookup: search_term}))
+
+
     return HttpResponse(report_parser.json_from_ajax(variants))
 
 '''
