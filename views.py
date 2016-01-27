@@ -43,8 +43,8 @@ def register(request):
                 lastname, firstname)
             message = 'User {} {} <{}> has registered and needs to be vetted.'.format(
                 firstname, lastname, user.email)
-            send_mail(subject, message, 'jgrundstad@uchicago.edu',
-                      ['jgrundstad@uchicago.edu'], fail_silently=False)
+            send_mail(subject, message, 'dfitzgerald@uchicago.edu',
+                      ['dfitzgerald@uchicago.edu', 'miguelb@uchicago.edu'], fail_silently=False)
         else:
             print user_form.errors
     else:
